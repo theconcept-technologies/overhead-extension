@@ -119,6 +119,9 @@ function chipText(hex: string): string {
 
     <!-- Environment chips -->
     <section v-if="!gameOpen" class="px-4 py-3 border-b border-hairline-light dark:border-hairline-dark">
+      <div class="text-[10px] font-bold uppercase tracking-[0.12em] text-muted-light dark:text-muted-dark mb-2">
+        Environments — click to activate
+      </div>
       <div class="flex flex-wrap gap-2">
         <button
           v-for="g in state.groups"
@@ -151,9 +154,13 @@ function chipText(hex: string): string {
     </section>
 
     <!-- Empty state -->
-    <section v-if="!gameOpen && activeGroups.length === 0" class="px-4 py-6 flex-1 flex items-center justify-center">
-      <p class="text-xs text-muted-light dark:text-muted-dark text-center">
-        {{ state.groups.length ? 'Enable an environment above to edit its headers.' : 'No environments yet — open the editor to create one.' }}
+    <section v-if="!gameOpen && activeGroups.length === 0" class="px-4 py-6 flex-1 flex flex-col items-center justify-center text-center gap-1.5">
+      <div class="text-brand dark:text-[#8FB4FF] text-xl leading-none animate-bounce">↑</div>
+      <p class="text-sm font-semibold">
+        {{ state.groups.length ? 'Click an environment above to start' : 'Create your first environment' }}
+      </p>
+      <p class="text-xs text-muted-light dark:text-muted-dark max-w-[240px]">
+        {{ state.groups.length ? 'Pick LIVE, DEV or another to edit its headers and apply them.' : 'Open the editor to add an environment and its headers.' }}
       </p>
     </section>
 
