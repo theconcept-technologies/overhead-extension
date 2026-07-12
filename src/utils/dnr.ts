@@ -115,12 +115,57 @@ export function countActiveHeaderOps(data: StorageData): number {
     .reduce((sum, g) => sum + g.headers.filter((h) => h.enabled && h.name.trim()).length, 0);
 }
 
-/** Atomically replace all dynamic rules with the freshly compiled set. */
-export async function applyRules(data: StorageData): Promise<void> {
+export interface ApplyResult {
+  applied: number;
+  /** Rules Chrome rejected (e.g. invalid regexFilter) — skipped so the rest work. */
+  failed: number;
+}
+
+/**
+ * Replace all dynamic rules with the freshly compiled set.
+ *
+ * `updateDynamicRules` is atomic: if a single rule is invalid (a bad regexFilter,
+ * or a responseHeaders action on Chrome < 116) the whole call rejects and NOTHING
+ * would be applied. To avoid one broken group silently disabling every rule, we
+ * fall back to applying rules one-by-one, skipping only the offenders and
+ * reporting how many failed so the UI can flag it.
+ */
+export async function applyRules(data: StorageData): Promise<ApplyResult> {
   const api = dnr();
-  if (!api) return;
+  if (!api) return { applied: 0, failed: 0 };
   const existing = await api.getDynamicRules();
   const removeRuleIds = existing.map((r) => r.id);
   const addRules = compileRules(data);
-  await api.updateDynamicRules({ removeRuleIds, addRules });
+
+  try {
+    await api.updateDynamicRules({ removeRuleIds, addRules });
+    return { applied: addRules.length, failed: 0 };
+  } catch {
+    // Clear everything, then re-add valid rules individually.
+    await api.updateDynamicRules({ removeRuleIds, addRules: [] });
+    let applied = 0;
+    let failed = 0;
+    for (const rule of addRules) {
+      try {
+        await api.updateDynamicRules({ addRules: [rule] });
+        applied += 1;
+      } catch (e) {
+        failed += 1;
+        console.error('[Overhead] skipped invalid rule', rule.id, e);
+      }
+    }
+    return { applied, failed };
+  }
+}
+
+/** Async-validate a regex against Chrome's DNR engine (returns null if OK). */
+export async function validateRegex(pattern: string): Promise<string | null> {
+  const api = dnr();
+  if (!api || !api.isRegexSupported || !pattern) return null;
+  try {
+    const res = await api.isRegexSupported({ regex: pattern });
+    return res.isSupported ? null : res.reason ?? 'Unsupported regex';
+  } catch {
+    return 'Invalid regex';
+  }
 }

@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useStore } from '../composables/useStore';
 import { applyTheme } from '../composables/useTheme';
 import { APP } from '../config';
 import { HeaderRule, MatchType, ResourceType, ThemePreference } from '../types';
+import { validateRegex } from '../utils/dnr';
 import { canAppend, isSensitiveHeader } from '../utils/headers';
 import { COMMON_HEADER_NAMES, HEADER_TEMPLATES, HeaderTemplate } from '../utils/headerCatalog';
 import { exportGroups, parseImport } from '../utils/importExport';
@@ -113,6 +114,21 @@ const sensitiveInSelected = computed(
   () =>
     !!selected.value &&
     selected.value.headers.some((h) => h.enabled && isSensitiveHeader(h.name))
+);
+
+// Validate the URL regex against Chrome's DNR engine, live.
+const regexError = ref<string | null>(null);
+watch(
+  () => [selected.value?.condition.matchType, selected.value?.condition.pattern],
+  async () => {
+    const g = selected.value;
+    if (!g || g.condition.matchType !== 'regexFilter' || !g.condition.pattern.trim()) {
+      regexError.value = null;
+      return;
+    }
+    regexError.value = await validateRegex(g.condition.pattern.trim());
+  },
+  { immediate: true }
 );
 
 function onAddGroup() {
@@ -395,9 +411,16 @@ function onImportFile(e: Event) {
                 v-if="selected.condition.matchType !== 'all'"
                 v-model="selected.condition.pattern"
                 :placeholder="selected.condition.matchType === 'regexFilter' ? '^https://api\\.example\\.com/.*' : 'https://api.myapp.com/*'"
-                class="flex-1 min-w-[220px] text-[13px] font-mono bg-canvas-light dark:bg-canvas-dark border border-hairline-light dark:border-[#2E3039] rounded-lg px-3 py-2 outline-none focus:border-brand"
+                class="flex-1 min-w-[220px] text-[13px] font-mono bg-canvas-light dark:bg-canvas-dark border rounded-lg px-3 py-2 outline-none focus:border-brand"
+                :class="regexError && selected.condition.matchType === 'regexFilter' ? 'border-danger' : 'border-hairline-light dark:border-[#2E3039]'"
               />
             </div>
+            <p
+              v-if="regexError && selected.condition.matchType === 'regexFilter'"
+              class="mt-2 text-[11.5px] text-danger"
+            >
+              Invalid regex — {{ regexError }}. This group won't be applied until it's fixed.
+            </p>
             <details class="mt-3">
               <summary class="text-[12.5px] font-semibold text-brand dark:text-[#8FB4FF] cursor-pointer">Advanced — resource types</summary>
               <div class="flex flex-wrap gap-2 mt-3">

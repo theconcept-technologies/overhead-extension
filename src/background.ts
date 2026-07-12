@@ -4,15 +4,25 @@
  * writes storage, we react (the pattern proven in xDebugHelperPro).
  */
 import { getStorageData, onStorageChanged } from './utils/storage';
-import { applyRules, countActiveHeaderOps } from './utils/dnr';
+import { ApplyResult, applyRules, countActiveHeaderOps } from './utils/dnr';
 import { StorageData } from './types';
 
 const ACTIVE_COLOR = '#4E5BF6'; // brand accent
 const IDLE_COLOR = '#6B6E7A';
+const ERROR_COLOR = '#E5484D'; // danger
 
-async function updateBadge(data: StorageData): Promise<void> {
+async function updateBadge(data: StorageData, result?: ApplyResult): Promise<void> {
   const count = countActiveHeaderOps(data);
   try {
+    if (result && result.failed > 0) {
+      // Some rules were rejected (e.g. an invalid URL regex) — flag it visibly.
+      await chrome.action.setBadgeBackgroundColor({ color: ERROR_COLOR });
+      await chrome.action.setBadgeText({ text: '!' });
+      await chrome.action.setTitle({
+        title: `Overhead — ${result.failed} rule${result.failed === 1 ? '' : 's'} invalid (check your URL regex)`,
+      });
+      return;
+    }
     await chrome.action.setBadgeBackgroundColor({
       color: data.enabled && count > 0 ? ACTIVE_COLOR : IDLE_COLOR,
     });
@@ -32,14 +42,15 @@ async function updateBadge(data: StorageData): Promise<void> {
 
 async function sync(): Promise<void> {
   const data = await getStorageData();
-  await applyRules(data);
-  await updateBadge(data);
+  const result = await applyRules(data);
+  await updateBadge(data, result);
 }
 
 // React to any config change.
 onStorageChanged((data) => {
-  applyRules(data).catch((e) => console.error('[Overhead] applyRules failed:', e));
-  updateBadge(data).catch((e) => console.error('[Overhead] updateBadge failed:', e));
+  applyRules(data)
+    .then((result) => updateBadge(data, result))
+    .catch((e) => console.error('[Overhead] applyRules failed:', e));
 });
 
 // Re-sync on the lifecycle events a service worker can wake for.

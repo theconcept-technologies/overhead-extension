@@ -165,7 +165,7 @@ function chipText(hex: string): string {
     </section>
 
     <!-- Active environments → inline header editor -->
-    <section v-if="!gameOpen && activeGroups.length" class="px-4 py-3 flex-1 overflow-y-auto max-h-[320px]">
+    <section v-if="!gameOpen && activeGroups.length" class="px-4 py-3 overflow-y-auto max-h-[380px]">
       <div v-for="g in activeGroups" :key="g.id" class="mb-3">
         <div class="flex items-center gap-2 mb-1.5">
           <span class="relative inline-flex w-2 h-2">

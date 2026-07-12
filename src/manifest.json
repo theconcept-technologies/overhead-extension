@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
   "name": "Overhead — HTTP Header Editor",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Modify HTTP request & response headers. Switch environments (LIVE/DEV). 100% local, no tracking, open source.",
-  "minimum_chrome_version": "101",
+  "minimum_chrome_version": "116",
   "permissions": ["declarativeNetRequest", "storage"],
   "host_permissions": ["<all_urls>"],
   "action": {
