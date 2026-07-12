@@ -65,17 +65,19 @@ pre-submit checklist. Nothing here ships in the extension.
   `https://github.com/theconcept-technologies/overhead-extension/blob/main/PRIVACY.md`
   (available once the repo is public) or a page on theconcept-technologies.com.
 
-## Assets needed before submit
+## Assets — READY (in `store-assets/`)
 
-- [ ] **Icon 128×128** — have it (`src/icons/icon-128.png`); Store also uses it.
-- [ ] **Screenshots** 1280×800 (or 640×400), 1–5 images. Suggested:
-      1. Environment switcher (LIVE ↔ DEV) in the popup
-      2. Inline header editing + templates in the popup
-      3. The full editor (Options) with conditions + credential warning
-      4. A "100% local · no tracking · open source" trust slide
-      (Design prompt E in `DESIGN_BRIEF.md` produces these.)
-- [ ] **Small promo tile** 440×280 (optional but recommended).
-- [ ] **Marquee** 1400×560 (optional).
+Final assets from Claude Design, correct dimensions, on brand.
+
+- [x] **Icon 128×128** — `src/icons/icon-128.png` (also the Store icon).
+- [x] **Screenshots** 1280×800 — upload in this order:
+      1. `store-assets/01-switch-environments.png` — “Switch environments in one click.”
+      2. `store-assets/02-edit-in-popup.png` — “Edit headers right in the popup.”
+      3. `store-assets/03-full-control.png` — “Full control when you need it.”
+      4. `store-assets/04-trust.png` — “The header editor you can actually trust.”
+      5. `store-assets/05-import-modheader.png` — “Coming from ModHeader? Import in one click.”
+- [x] **Small promo tile** 440×280 — `store-assets/tile-440x280.png`.
+- [x] **Marquee** 1400×560 — `store-assets/marquee-1400x560.png`.
 
 ## Pre-submit checklist
 
