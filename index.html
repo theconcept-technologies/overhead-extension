@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Overhead — Live Preview</title>
+    <style>
+      body { margin: 0; font-family: 'Inter', system-ui, sans-serif; }
+      .wrap { padding: 32px; max-width: 1320px; margin: 0 auto; }
+      .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.5; margin: 0 0 12px; }
+      .popup-frame { width: 380px; border-radius: 16px; overflow: hidden; box-shadow: 0 24px 60px -20px rgba(0,0,0,0.55); border: 1px solid rgba(128,128,128,0.25); }
+      .options-frame { border-radius: 16px; overflow: hidden; border: 1px solid rgba(128,128,128,0.25); box-shadow: 0 24px 60px -20px rgba(0,0,0,0.55); }
+      h2 { font-size: 20px; margin: 0 0 16px; }
+      section { margin-bottom: 48px; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <section>
+        <p class="eyebrow">Toolbar popup — 380px</p>
+        <div class="popup-frame"><div id="popup"></div></div>
+      </section>
+
+      <div id="options-anchor"></div>
+      <section>
+        <p class="eyebrow">Options / full editor</p>
+        <div class="options-frame"><div id="options"></div></div>
+      </section>
+    </div>
+    <script type="module" src="/preview/main.ts"></script>
+  </body>
+</html>

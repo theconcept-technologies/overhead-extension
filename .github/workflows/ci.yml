@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Validate manifest
+        run: |
+          node -e "
+            const m = require('./dist/manifest.json');
+            if (m.manifest_version !== 3) throw new Error('manifest_version must be 3');
+            if (!m.name || !m.version) throw new Error('name/version required');
+            if (!m.content_security_policy) throw new Error('CSP missing');
+            console.log('manifest OK:', m.name, m.version);
+          "
+      - uses: actions/upload-artifact@v4
+        with:
+          name: overhead-dist
+          path: dist/
