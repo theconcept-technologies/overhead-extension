@@ -103,9 +103,39 @@ function drawIcon(size) {
   return buf;
 }
 
+// Supersampling factor: render at size*SS, then average down for smooth,
+// anti-aliased edges and rounded corners (alpha-weighted to avoid dark fringes).
+const SS = 4;
+function downsample(hi, hiSize, size, ss) {
+  const out = Buffer.alloc(size * size * 4, 0);
+  const n = ss * ss;
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      let r = 0, g = 0, b = 0, a = 0;
+      for (let dy = 0; dy < ss; dy++) {
+        for (let dx = 0; dx < ss; dx++) {
+          const i = ((y * ss + dy) * hiSize + (x * ss + dx)) * 4;
+          const al = hi[i + 3];
+          r += hi[i] * al; g += hi[i + 1] * al; b += hi[i + 2] * al; a += al;
+        }
+      }
+      const o = (y * size + x) * 4;
+      out[o + 3] = Math.round(a / n);
+      if (a > 0) {
+        out[o] = Math.round(r / a);
+        out[o + 1] = Math.round(g / a);
+        out[o + 2] = Math.round(b / a);
+      }
+    }
+  }
+  return out;
+}
+
 fs.mkdirSync(OUT_DIR, { recursive: true });
 for (const size of SIZES) {
-  fs.writeFileSync(path.join(OUT_DIR, `icon-${size}.png`), encodePng(size, drawIcon(size)));
-  console.log(`✓ icon-${size}.png`);
+  const hi = drawIcon(size * SS);
+  const px = downsample(hi, size * SS, size, SS);
+  fs.writeFileSync(path.join(OUT_DIR, `icon-${size}.png`), encodePng(size, px));
+  console.log(`✓ icon-${size}.png (anti-aliased)`);
 }
 console.log('Overhead brand icons generated in src/icons/');
