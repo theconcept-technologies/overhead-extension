@@ -8,7 +8,8 @@ pre-submit checklist. Nothing here ships in the extension.
 - **Product name:** Overhead — HTTP Header Editor
 - **Category:** Developer Tools
 - **Default language:** English (German can be added later)
-- **Version at submit:** see `manifest.json` (`0.1.0`)
+- **Version:** `0.1.0` submitted (in review). **`0.1.1` is built & ready** as the next update
+  (`overhead-v0.1.1.zip`) — see "Updating to 0.1.1" below.
 
 ## Summary (short description — max 132 chars)
 
@@ -85,7 +86,26 @@ Final assets from Claude Design, correct dimensions, on brand.
       theconcept technologies.
 - [ ] Privacy policy hosted at a public URL (see above).
 - [ ] Production zip built: `npm run build` → zip `dist/` (or `npm run release:patch`).
-- [ ] Load-unpacked smoke test in Chrome passed (popup + options + a real header
+- [x] Load-unpacked smoke test in Chrome passed (popup + options + a real header
       applied on https://httpbin.org/headers).
-- [ ] Make the GitHub repo **public** (currently private).
-- [ ] Submit for review (header/host-permission extensions may take a few days).
+- [x] GitHub repo is **public**.
+- [x] Submitted 0.1.0 for review (header/host-permission extensions may take a few days).
+
+## Updating to 0.1.1
+
+**Upload file:** `overhead-v0.1.1.zip` (project root, or download from the GitHub Release
+`v0.1.1`). Contains manifest version `0.1.1`, `minimum_chrome_version: 116`.
+
+**Timing — important:** the Chrome Web Store reviews one submission at a time. While **0.1.0 is
+"In review" you cannot submit 0.1.1 as an update** — the "Submit for review" action stays disabled
+until the first review finishes. So:
+
+1. Wait for 0.1.0's review to complete (approved & published, or rejected).
+2. In the dashboard → the Overhead item → **Package** → upload `overhead-v0.1.1.zip`.
+3. Store listing / privacy / screenshots stay the same — nothing else to change.
+4. **Submit for review** again (updates usually clear faster than the first review).
+
+**Optional — get 0.1.1 into the *first* public version:** if you'd rather the very first published
+build carry the nicer icon + fixes, you can try replacing the pending package: in the dashboard open
+the still-in-review item and upload `overhead-v0.1.1.zip` over it. If the dashboard won't let you
+replace a package that's already in review, fall back to the update flow above once 0.1.0 clears.
