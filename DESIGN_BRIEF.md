@@ -197,3 +197,64 @@ haben das fertige Branding live. Bis dahin läuft alles mit neutralen Platzhalte
 - Environment-Palette (`src/types.ts` → `GROUP_COLORS`):
   `#ef4444` (LIVE) · `#22c55e` (DEV) · `#f59e0b` (Staging) · `#3b82f6` · `#a855f7` · `#14b8a6`
 - Badge „aktiv": `#22c55e` (`src/background.ts`)
+
+---
+
+## 9) PROMPT — Chrome Web Store Screenshots (final, use this)
+
+> Reale Brand-Werte (implementiert): Accent-Indigo `#4E5BF6`; dark canvas `#0C0D11` /
+> surface `#16171D`; Environment-Farben LIVE `#E5484D`, DEV `#30A46C`, Staging `#F5A623`,
+> Preview `#8E4EC6`; Font Inter. Brand-Doc-Hintergrund `#101116` mit feinem Dot-Grid.
+
+Copy-paste in Claude Design (im selben Projekt, das das Brand Kit enthält):
+
+> Using the Overhead brand kit already in this project (color tokens, logo mark, and the
+> popup + options mockups), design **5 Chrome Web Store screenshots at exactly 1280×800px**,
+> dark theme, visually consistent.
+>
+> Shared frame for all 5: the brand's charcoal background (#101116 with the faint dot-grid),
+> a small Overhead logo + wordmark top-left, and one short caption headline per slide in the
+> accent indigo (#4E5BF6). Float the real product UI (from the popup/options mockups) on a soft
+> shadow, centered. Clean, premium, developer-tool aesthetic — minimal text, lots of calm space.
+> Use Inter.
+>
+> 1. Caption **“Switch environments in one click.”** — the 380px popup: environment chips
+>    LIVE (#E5484D) + DEV (#30A46C) active, Staging (#F5A623) + Preview (#8E4EC6) inactive,
+>    with the grouped active-header list below.
+> 2. Caption **“Edit headers right in the popup.”** — the popup inline editor: editable rows
+>    (checkbox · REQ/RES · set · name · value) with the Templates dropdown open showing
+>    Bearer token / Custom User-Agent / CORS presets.
+> 3. Caption **“Full control when you need it.”** — the options page: environment sidebar, the
+>    “Apply to” URL-condition card, the amber credential-warning banner, and the request/response
+>    headers table (show an optional label like “Prod API token”).
+> 4. Caption **“100% local. No tracking. No ads. Open source.”** — a bold trust slide: the four
+>    claims as pill chips on the dark background with the logo. Confident, minimal.
+> 5. Caption **“Coming from ModHeader? Import in one click.”** — the import panel with a JSON
+>    snippet and the “Imported 3 group(s) from modheader” success state.
+>
+> Export each as a 1280×800 PNG. Optionally also produce a **440×280** small promo tile and a
+> **1400×560** marquee reusing slide 1 + the trust strip.
+
+### Current UI reference (2026-07) — paste this so the screenshots match the shipped product
+
+The original Deliverable C/D mockups are slightly behind the shipped build. Updated details:
+
+- **The popup is now a full inline editor**, not a read-only summary. For each active
+  environment it shows editable header rows: `[✓ enable] [REQ/RES toggle] [SET/APP/RM] [name] [value] [✕]`.
+  Each environment header has a **“Templates ▾”** button and a **“+ Add”** button. Footer left link
+  reads **“Advanced editor →”**, right link **“♥ Support”**. Header bar: logo + “Overhead” + a
+  **“N active”** badge + master on/off toggle.
+- **Templates dropdown items** (both popup + options): Bearer token · Basic auth · Custom User-Agent ·
+  X-Forwarded-For · Accept-Language · Cache-Control: no-cache · JSON Content-Type · CORS: allow all
+  origins · Strip CSP header. Each row: bold label + monospace header name.
+- **Optional per-header label**: in the popup it appears as a small muted line *above* the row
+  (e.g. “Prod API token”); in the options each header row starts with a **“Label (optional)”** input.
+- **Options header row order**: `[✓] [Label (optional)] [REQ/RES select] [op select] [name w/ autocomplete] [value] [✕]`.
+  The Headers section header has **Templates ▾**, **Enable/Disable all**, **+ Request**, **+ Response**.
+- **Top bar (options)**: logo + “Overhead” + tagline; right side theme segmented **System / Light / Dark**,
+  **Import**, **Export**, **Enabled** toggle.
+- **Empty popup state** (no active environment): shows the hidden **Stack** mini-game (dark canvas,
+  header-bar blocks) — only relevant if you want a “delight” slide; not required for the store set.
+
+Tip: you can also drag the live screenshots I captured (popup inline editor + templates, options with
+label) into Claude Design as visual references so the frames match 1:1.
