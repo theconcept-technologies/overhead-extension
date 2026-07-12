@@ -118,7 +118,7 @@ function chipText(hex: string): string {
     </header>
 
     <!-- Environment chips -->
-    <section class="px-4 py-3 border-b border-hairline-light dark:border-hairline-dark">
+    <section v-if="!gameOpen" class="px-4 py-3 border-b border-hairline-light dark:border-hairline-dark">
       <div class="flex flex-wrap gap-2">
         <button
           v-for="g in state.groups"
@@ -150,16 +150,15 @@ function chipText(hex: string): string {
       </div>
     </section>
 
-    <!-- Empty state → the Stack game -->
-    <section v-if="activeGroups.length === 0" class="px-4 py-4 flex-1">
-      <p class="text-xs text-muted-light dark:text-muted-dark text-center mb-3">
-        {{ state.groups.length ? 'Enable an environment above to edit its headers.' : 'No environment active — stack a few bars while you\'re here.' }}
+    <!-- Empty state -->
+    <section v-if="!gameOpen && activeGroups.length === 0" class="px-4 py-6 flex-1 flex items-center justify-center">
+      <p class="text-xs text-muted-light dark:text-muted-dark text-center">
+        {{ state.groups.length ? 'Enable an environment above to edit its headers.' : 'No environments yet — open the editor to create one.' }}
       </p>
-      <StackGame />
     </section>
 
     <!-- Active environments → inline header editor -->
-    <section v-else class="px-4 py-3 flex-1 overflow-y-auto max-h-[320px]">
+    <section v-if="!gameOpen && activeGroups.length" class="px-4 py-3 flex-1 overflow-y-auto max-h-[320px]">
       <div v-for="g in activeGroups" :key="g.id" class="mb-3">
         <div class="flex items-center gap-2 mb-1.5">
           <span class="relative inline-flex w-2 h-2">
@@ -242,6 +241,7 @@ function chipText(hex: string): string {
 
     <!-- Footer -->
     <footer
+      v-if="!gameOpen"
       class="flex items-center justify-between px-4 py-3 border-t border-hairline-light dark:border-hairline-dark text-xs"
     >
       <button class="font-semibold text-brand dark:text-[#8FB4FF] hover:underline" @click="openOptions">
@@ -256,15 +256,14 @@ function chipText(hex: string): string {
       >
     </footer>
 
-    <!-- Easter-egg game overlay -->
-    <div
-      v-if="gameOpen"
-      class="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/60 p-4"
-    >
-      <div class="mb-2 text-xs font-semibold text-white/85">You found it 🎮</div>
+    <!-- Easter-egg game (inline & compact so the popup never scrolls) -->
+    <section v-if="gameOpen" class="px-4 py-4 flex flex-col items-center">
+      <div class="w-full flex items-center justify-between mb-2">
+        <span class="text-xs font-semibold">You found it 🎮</span>
+        <button class="text-xs text-muted-light dark:text-muted-dark hover:text-brand" @click="gameOpen = false">Close</button>
+      </div>
       <StackGame />
-      <button class="mt-3 text-xs text-white/70 hover:text-white" @click="gameOpen = false">Close</button>
-    </div>
+    </section>
 
     <SponsorOverlay v-if="showSponsor" @close="showSponsor = false" />
 

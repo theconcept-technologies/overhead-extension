@@ -4,7 +4,7 @@
 // Best score persists in localStorage — nothing leaves the device.
 (function () {
   const PALETTE = ['#E5484D', '#30A46C', '#F5A623', '#4C8DF0', '#8E4EC6', '#12A594'];
-  const W = 300, H = 420, BH = 26;
+  const W = 300, H = 360, BH = 26;
 
   class OverheadStack extends HTMLElement {
     connectedCallback() {
