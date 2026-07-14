@@ -227,11 +227,11 @@ function onImportFile(e: Event) {
 <template>
   <div
     v-if="loaded"
-    class="min-h-screen bg-canvas-light dark:bg-canvas-dark text-ink-light dark:text-ink-dark"
+    class="h-screen flex flex-col overflow-hidden bg-canvas-light dark:bg-canvas-dark text-ink-light dark:text-ink-dark"
   >
     <!-- Top bar -->
     <header
-      class="sticky top-0 z-10 flex items-center justify-between px-6 py-3 border-b border-hairline-light dark:border-hairline-dark bg-surface-light/95 dark:bg-surface-dark/95 backdrop-blur"
+      class="shrink-0 z-10 flex items-center justify-between px-6 py-3 border-b border-hairline-light dark:border-hairline-dark bg-surface-light dark:bg-surface-dark"
     >
       <div class="flex items-center gap-3">
         <button class="flex items-center rounded-md focus:outline-none" title="Overhead" @click="onLogoClick">
@@ -296,7 +296,7 @@ function onImportFile(e: Event) {
     <!-- Import panel -->
     <div
       v-if="importOpen"
-      class="px-6 py-4 border-b border-hairline-light dark:border-hairline-dark bg-surface-light dark:bg-surface-dark"
+      class="shrink-0 px-6 py-4 border-b border-hairline-light dark:border-hairline-dark bg-surface-light dark:bg-surface-dark"
     >
       <div class="text-sm font-semibold mb-2">Import configuration</div>
       <p class="text-xs text-muted-light dark:text-muted-dark mb-2">
@@ -318,7 +318,7 @@ function onImportFile(e: Event) {
     <!-- Export panel -->
     <div
       v-if="exportOpen"
-      class="px-6 py-4 border-b border-hairline-light dark:border-hairline-dark bg-surface-light dark:bg-surface-dark"
+      class="shrink-0 px-6 py-4 border-b border-hairline-light dark:border-hairline-dark bg-surface-light dark:bg-surface-dark"
     >
       <div class="flex items-center justify-between mb-2">
         <span class="text-sm font-semibold">Export configuration</span>
@@ -336,9 +336,9 @@ function onImportFile(e: Event) {
       </div>
     </div>
 
-    <div class="flex">
+    <div class="flex flex-1 min-h-0">
       <!-- Sidebar -->
-      <aside class="w-[236px] shrink-0 border-r border-hairline-light dark:border-hairline-dark min-h-[calc(100vh-57px)] p-3">
+      <aside class="w-[236px] shrink-0 border-r border-hairline-light dark:border-hairline-dark p-3 overflow-y-auto">
         <div class="text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted-light dark:text-muted-dark px-2.5 pb-2">
           Environments
         </div>
@@ -401,7 +401,7 @@ function onImportFile(e: Event) {
       </aside>
 
       <!-- Editor -->
-      <main class="flex-1 p-6 max-w-4xl">
+      <main class="flex-1 min-w-0 p-6 max-w-4xl overflow-y-auto">
         <div v-if="!selected" class="text-sm text-muted-light dark:text-muted-dark py-24 text-center">
           Select or create an environment to edit its headers.
         </div>
@@ -605,7 +605,7 @@ function onImportFile(e: Event) {
 
     <!-- Footer — product + company (always visible) -->
     <footer
-      class="sticky bottom-0 z-10 flex flex-wrap items-center justify-between gap-2 px-6 py-3 border-t border-hairline-light dark:border-hairline-dark bg-canvas-light/95 dark:bg-canvas-dark/95 backdrop-blur text-[11.5px] text-muted-light dark:text-muted-dark"
+      class="shrink-0 z-10 flex flex-wrap items-center justify-between gap-2 px-6 py-3 border-t border-hairline-light dark:border-hairline-dark bg-surface-light dark:bg-surface-dark text-[11.5px] text-muted-light dark:text-muted-dark"
     >
       <span>
         {{ APP.name }}<span v-if="version" class="opacity-70"> v{{ version }}</span> — a
