@@ -3,6 +3,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useStore } from '../composables/useStore';
 import { applyTheme } from '../composables/useTheme';
 import { APP, appVersion } from '../config';
+import { t } from '../i18n';
 import { HeaderOp, HeaderRule } from '../types';
 import { isSensitiveHeader } from '../utils/headers';
 import { COMMON_HEADER_NAMES, HEADER_TEMPLATES, HeaderTemplate } from '../utils/headerCatalog';
@@ -123,10 +124,10 @@ function chipText(hex: string): string {
           v-if="state.enabled && activeCount > 0"
           class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-brand-tint text-brand dark:bg-[#1C2140] dark:text-[#8FB4FF]"
         >
-          {{ activeCount }} active
+          {{ t('active', { n: activeCount }) }}
         </span>
       </div>
-      <label class="inline-flex items-center gap-2 cursor-pointer select-none" title="Master switch">
+      <label class="inline-flex items-center gap-2 cursor-pointer select-none" :title="t('masterSwitch')">
         <input
           type="checkbox"
           class="sr-only peer"
@@ -142,7 +143,7 @@ function chipText(hex: string): string {
     <!-- Environment chips -->
     <section v-if="!gameOpen" class="px-4 py-3 border-b border-hairline-light dark:border-hairline-dark">
       <div class="text-[10px] font-bold uppercase tracking-[0.12em] text-muted-light dark:text-muted-dark mb-2">
-        Environments — click to activate
+        {{ t('envsClickToActivate') }}
       </div>
       <div class="flex flex-wrap gap-2">
         <button
@@ -170,7 +171,7 @@ function chipText(hex: string): string {
           class="oh-chip px-3 py-1.5 rounded-full text-xs font-semibold text-muted-light dark:text-muted-dark border border-dashed border-[#C4C7D0] dark:border-[#3A3C46] hover:text-brand hover:border-brand"
           @click="openOptions"
         >
-          + New
+          {{ t('new') }}
         </button>
       </div>
     </section>
@@ -179,10 +180,10 @@ function chipText(hex: string): string {
     <section v-if="!gameOpen && activeGroups.length === 0" class="px-4 py-6 flex-1 flex flex-col items-center justify-center text-center gap-1.5">
       <div class="text-brand dark:text-[#8FB4FF] text-xl leading-none animate-bounce">↑</div>
       <p class="text-sm font-semibold">
-        {{ state.groups.length ? 'Click an environment above to start' : 'Create your first environment' }}
+        {{ state.groups.length ? t('clickEnvToStart') : t('createFirstEnv') }}
       </p>
       <p class="text-xs text-muted-light dark:text-muted-dark max-w-[240px]">
-        {{ state.groups.length ? 'Pick LIVE, DEV or another to edit its headers and apply them.' : 'Open the editor to add an environment and its headers.' }}
+        {{ state.groups.length ? t('emptyHintEnvs') : t('emptyHintNoEnvs') }}
       </p>
     </section>
 
@@ -200,10 +201,10 @@ function chipText(hex: string): string {
               class="text-[11px] font-medium text-muted-light dark:text-muted-dark hover:text-brand"
               @click="templatesForGroup = templatesForGroup === g.id ? null : g.id"
             >
-              Templates ▾
+              {{ t('templates') }}
             </button>
             <button class="text-[11px] font-semibold text-brand dark:text-[#8FB4FF]" @click="addHeader(g.id, 'request')">
-              + Add
+              {{ t('add') }}
             </button>
           </span>
         </div>
@@ -257,13 +258,13 @@ function chipText(hex: string): string {
             placeholder="value"
             class="flex-1 min-w-0 font-mono text-xs bg-transparent border border-hairline-light dark:border-[#2E3039] rounded px-1.5 py-1 outline-none focus:border-brand"
           />
-          <span v-else class="flex-1 text-[10px] text-muted-light dark:text-muted-dark italic">removed</span>
+          <span v-else class="flex-1 text-[10px] text-muted-light dark:text-muted-dark italic">{{ t('removed') }}</span>
           <button class="shrink-0 text-muted-light dark:text-muted-dark hover:text-danger px-0.5" title="Remove" @click="removeHeader(g.id, h.id)">✕</button>
           </div>
         </div>
 
         <div v-if="g.headers.length === 0" class="text-[11px] text-muted-light dark:text-muted-dark pt-1">
-          No headers yet.
+          {{ t('noHeaders') }}
         </div>
 
         <!-- Always-visible add affordance below the last row -->
@@ -271,7 +272,7 @@ function chipText(hex: string): string {
           class="w-full mt-1.5 py-1.5 rounded-lg border border-dashed border-hairline-light dark:border-[#3A3C46] text-[11px] font-medium text-muted-light dark:text-muted-dark hover:text-brand hover:border-brand transition-colors"
           @click="addHeader(g.id, 'request')"
         >
-          + Add header
+          {{ t('addHeader') }}
         </button>
       </div>
     </section>
@@ -283,14 +284,14 @@ function chipText(hex: string): string {
     >
       <div class="flex items-center justify-between">
         <button class="font-semibold text-brand dark:text-[#8FB4FF] hover:underline" @click="openOptions">
-          Advanced editor →
+          {{ t('advancedEditor') }}
         </button>
         <a
           :href="APP.donate.buyMeACoffee"
           target="_blank"
           rel="noopener"
           class="text-muted-light dark:text-muted-dark hover:text-brand"
-          >♥ Support</a
+          >{{ t('support') }}</a
         >
       </div>
       <div class="mt-1.5 text-center text-[10px] text-muted-light dark:text-muted-dark">
@@ -302,8 +303,8 @@ function chipText(hex: string): string {
     <!-- Easter-egg game (inline & compact so the popup never scrolls) -->
     <section v-if="gameOpen" class="px-4 py-4 flex flex-col items-center">
       <div class="w-full flex items-center justify-between mb-2">
-        <span class="text-xs font-semibold">You found it 🎮</span>
-        <button class="text-xs text-muted-light dark:text-muted-dark hover:text-brand" @click="gameOpen = false">Close</button>
+        <span class="text-xs font-semibold">{{ t('youFoundIt') }}</span>
+        <button class="text-xs text-muted-light dark:text-muted-dark hover:text-brand" @click="gameOpen = false">{{ t('close') }}</button>
       </div>
       <StackGame />
     </section>

@@ -3,6 +3,7 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useStore } from '../composables/useStore';
 import { applyTheme } from '../composables/useTheme';
 import { APP, appVersion } from '../config';
+import { LocalePref, t } from '../i18n';
 import { HeaderRule, MatchType, ResourceType, ThemePreference } from '../types';
 import { validateRegex } from '../utils/dnr';
 import { canAppend, isSensitiveHeader } from '../utils/headers';
@@ -26,6 +27,7 @@ const {
   setAllHeaders,
   replaceGroups,
   setTheme,
+  setLocale,
 } = useStore();
 
 const templatesOpen = ref(false);
@@ -54,6 +56,7 @@ const selectedId = ref<string | null>(null);
 const importOpen = ref(false);
 const importText = ref('');
 const importMsg = ref('');
+const importOk = ref(false);
 const exportOpen = ref(false);
 const exportText = ref('');
 
@@ -71,11 +74,18 @@ const RESOURCE_TYPES: ResourceType[] = [
 ];
 
 const THEMES: ThemePreference[] = ['system', 'light', 'dark'];
-const MATCH_TYPES: { value: MatchType; label: string }[] = [
-  { value: 'all', label: 'All URLs' },
-  { value: 'urlFilter', label: 'URL wildcard' },
-  { value: 'regexFilter', label: 'URL regex' },
-];
+const LOCALES: LocalePref[] = ['system', 'en', 'de'];
+const MATCH_TYPES: MatchType[] = ['all', 'urlFilter', 'regexFilter'];
+
+function themeLabel(th: ThemePreference) {
+  return th === 'light' ? t('themeLight') : th === 'dark' ? t('themeDark') : t('themeSystem');
+}
+function localeLabel(l: LocalePref) {
+  return l === 'en' ? 'English' : l === 'de' ? 'Deutsch' : t('langSystem');
+}
+function matchTypeLabel(m: MatchType) {
+  return m === 'all' ? t('allUrls') : m === 'urlFilter' ? t('urlWildcard') : t('urlRegex');
+}
 
 // Easter egg: Konami code (↑↑↓↓←→←→ b a) or clicking the logo 7× unlocks the
 // equalizer dance + the Stack game.
@@ -203,11 +213,13 @@ async function copyExport() {
 function runImport() {
   const result = parseImport(importText.value);
   if (!result.ok) {
+    importOk.value = false;
     importMsg.value = result.error;
     return;
   }
   replaceGroups(result.groups);
-  importMsg.value = `Imported ${result.groups.length} group(s) from ${result.source}.`;
+  importOk.value = true;
+  importMsg.value = t('imported', { n: result.groups.length, source: result.source });
   importText.value = '';
   if (!selectedId.value && state.groups.length) selectedId.value = state.groups[0].id;
 }
@@ -239,40 +251,56 @@ function onImportFile(e: Event) {
         </button>
         <div class="flex flex-col leading-tight">
           <span class="font-bold tracking-tight">{{ APP.name }}</span>
-          <span class="text-[11.5px] text-muted-light dark:text-muted-dark">{{ APP.tagline }}</span>
+          <span class="text-[11.5px] text-muted-light dark:text-muted-dark">{{ t('tagline') }}</span>
         </div>
       </div>
       <div class="flex items-center gap-3">
-        <!-- theme segmented -->
-        <div class="flex rounded-lg border border-hairline-light dark:border-[#2E3039] p-0.5">
+        <!-- language segmented -->
+        <div class="flex rounded-lg border border-hairline-light dark:border-[#2E3039] p-0.5" :title="t('langLabel')">
           <button
-            v-for="t in THEMES"
-            :key="t"
-            class="text-xs capitalize px-2.5 py-1 rounded-md transition-colors"
+            v-for="l in LOCALES"
+            :key="l"
+            class="text-xs px-2.5 py-1 rounded-md transition-colors"
             :class="
-              state.theme === t
+              state.locale === l
                 ? 'bg-hairline-light dark:bg-hairline-dark font-semibold'
                 : 'text-muted-light dark:text-muted-dark'
             "
-            @click="setTheme(t)"
+            @click="setLocale(l)"
           >
-            {{ t }}
+            {{ l === 'system' ? '🌐' : localeLabel(l) }}
+          </button>
+        </div>
+        <!-- theme segmented -->
+        <div class="flex rounded-lg border border-hairline-light dark:border-[#2E3039] p-0.5">
+          <button
+            v-for="th in THEMES"
+            :key="th"
+            class="text-xs px-2.5 py-1 rounded-md transition-colors"
+            :class="
+              state.theme === th
+                ? 'bg-hairline-light dark:bg-hairline-dark font-semibold'
+                : 'text-muted-light dark:text-muted-dark'
+            "
+            @click="setTheme(th)"
+          >
+            {{ themeLabel(th) }}
           </button>
         </div>
         <button
           class="text-xs font-semibold px-3 py-1.5 rounded-lg border border-hairline-light dark:border-[#2E3039] hover:border-brand"
           @click="importOpen = !importOpen"
         >
-          Import
+          {{ t('import') }}
         </button>
         <button
           class="text-xs font-semibold px-3 py-1.5 rounded-lg border border-hairline-light dark:border-[#2E3039] hover:border-brand"
           @click="openExport"
         >
-          Export
+          {{ t('export') }}
         </button>
         <label class="inline-flex items-center gap-2 cursor-pointer select-none">
-          <span class="text-xs text-muted-light dark:text-muted-dark">{{ state.enabled ? 'Enabled' : 'Disabled' }}</span>
+          <span class="text-xs text-muted-light dark:text-muted-dark">{{ state.enabled ? t('enabled') : t('disabled') }}</span>
           <input
             type="checkbox"
             class="sr-only peer"
@@ -288,7 +316,7 @@ function onImportFile(e: Event) {
           title="Close the editor — the quick popup is on your toolbar icon"
           @click="closeEditor"
         >
-          Done
+          {{ t('done') }}
         </button>
       </div>
     </header>
@@ -298,9 +326,9 @@ function onImportFile(e: Event) {
       v-if="importOpen"
       class="shrink-0 px-6 py-4 border-b border-hairline-light dark:border-hairline-dark bg-surface-light dark:bg-surface-dark"
     >
-      <div class="text-sm font-semibold mb-2">Import configuration</div>
+      <div class="text-sm font-semibold mb-2">{{ t('importConfig') }}</div>
       <p class="text-xs text-muted-light dark:text-muted-dark mb-2">
-        Paste an Overhead or ModHeader export, or choose a file. Imported groups are added disabled.
+        {{ t('importHint') }}
       </p>
       <textarea
         v-model="importText"
@@ -309,9 +337,9 @@ function onImportFile(e: Event) {
         class="w-full text-xs font-mono p-2.5 rounded-lg border border-hairline-light dark:border-[#2E3039] bg-canvas-light dark:bg-canvas-dark outline-none focus:border-brand"
       ></textarea>
       <div class="flex items-center gap-3 mt-2">
-        <button class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-brand text-white hover:bg-brand-hover" @click="runImport">Import</button>
+        <button class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-brand text-white hover:bg-brand-hover" @click="runImport">{{ t('import') }}</button>
         <input type="file" accept="application/json,.json" class="text-xs" @change="onImportFile" />
-        <span class="text-xs" :class="importMsg.startsWith('Imported') ? 'text-success' : 'text-danger'">{{ importMsg }}</span>
+        <span class="text-xs" :class="importOk ? 'text-success' : 'text-danger'">{{ importMsg }}</span>
       </div>
     </div>
 
@@ -321,8 +349,8 @@ function onImportFile(e: Event) {
       class="shrink-0 px-6 py-4 border-b border-hairline-light dark:border-hairline-dark bg-surface-light dark:bg-surface-dark"
     >
       <div class="flex items-center justify-between mb-2">
-        <span class="text-sm font-semibold">Export configuration</span>
-        <button class="text-xs text-muted-light dark:text-muted-dark hover:text-brand" @click="exportOpen = false">Close</button>
+        <span class="text-sm font-semibold">{{ t('exportConfig') }}</span>
+        <button class="text-xs text-muted-light dark:text-muted-dark hover:text-brand" @click="exportOpen = false">{{ t('close') }}</button>
       </div>
       <textarea
         :value="exportText"
@@ -331,8 +359,8 @@ function onImportFile(e: Event) {
         class="w-full text-xs font-mono p-2.5 rounded-lg border border-hairline-light dark:border-[#2E3039] bg-canvas-light dark:bg-canvas-dark outline-none"
       ></textarea>
       <div class="flex gap-3 mt-2">
-        <button class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-brand text-white hover:bg-brand-hover" @click="downloadExport">Download</button>
-        <button class="text-xs font-semibold px-3 py-1.5 rounded-lg border border-hairline-light dark:border-[#2E3039]" @click="copyExport">Copy</button>
+        <button class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-brand text-white hover:bg-brand-hover" @click="downloadExport">{{ t('download') }}</button>
+        <button class="text-xs font-semibold px-3 py-1.5 rounded-lg border border-hairline-light dark:border-[#2E3039]" @click="copyExport">{{ t('copy') }}</button>
       </div>
     </div>
 
@@ -340,7 +368,7 @@ function onImportFile(e: Event) {
       <!-- Sidebar -->
       <aside class="w-[236px] shrink-0 border-r border-hairline-light dark:border-hairline-dark p-3 overflow-y-auto">
         <div class="text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted-light dark:text-muted-dark px-2.5 pb-2">
-          Environments
+          {{ t('environments') }}
         </div>
         <ul class="space-y-1">
           <li v-for="g in state.groups" :key="g.id">
@@ -367,16 +395,16 @@ function onImportFile(e: Event) {
           class="w-full mt-2 px-2.5 py-2 rounded-lg text-sm font-semibold text-muted-light dark:text-muted-dark border border-dashed border-hairline-light dark:border-[#3A3C46] hover:text-brand hover:border-brand"
           @click="onAddGroup"
         >
-          + Add environment
+          {{ t('addEnvironment') }}
         </button>
 
         <!-- Support / donations -->
         <div class="mt-5 rounded-xl border border-hairline-light dark:border-hairline-dark p-3">
           <div class="text-[11px] font-bold uppercase tracking-[0.12em] text-muted-light dark:text-muted-dark mb-1.5">
-            ☕ Support us
+            {{ t('supportUs') }}
           </div>
           <p class="text-[11.5px] text-muted-light dark:text-muted-dark leading-relaxed mb-2.5">
-            If you find Overhead useful, consider supporting continued development.
+            {{ t('supportBody') }}
           </p>
           <div class="flex flex-col gap-2">
             <a
@@ -395,7 +423,7 @@ function onImportFile(e: Event) {
             >
           </div>
           <p class="mt-2.5 text-[10.5px] leading-relaxed text-muted-light dark:text-muted-dark">
-            Every bit helps us maintain and improve this tool. — {{ APP.company }}
+            {{ t('everyBit', { company: APP.company }) }}
           </p>
         </div>
       </aside>
@@ -403,7 +431,7 @@ function onImportFile(e: Event) {
       <!-- Editor -->
       <main class="flex-1 min-w-0 p-6 max-w-4xl overflow-y-auto">
         <div v-if="!selected" class="text-sm text-muted-light dark:text-muted-dark py-24 text-center">
-          Select or create an environment to edit its headers.
+          {{ t('selectEnv') }}
         </div>
 
         <div v-else class="space-y-5">
@@ -422,40 +450,40 @@ function onImportFile(e: Event) {
             />
             <label class="inline-flex items-center gap-2 text-sm cursor-pointer">
               <input type="checkbox" class="accent-brand w-4 h-4" :checked="selected.enabled" @change="toggleGroup(selected.id, ($event.target as HTMLInputElement).checked)" />
-              Active
+              {{ t('active2') }}
             </label>
-            <button class="text-[13px] text-muted-light dark:text-muted-dark font-medium hover:text-brand" @click="onDuplicate(selected.id)">Duplicate</button>
-            <button class="text-[13px] text-danger font-medium hover:underline" @click="onRemoveGroup(selected.id)">Delete</button>
+            <button class="text-[13px] text-muted-light dark:text-muted-dark font-medium hover:text-brand" @click="onDuplicate(selected.id)">{{ t('duplicate') }}</button>
+            <button class="text-[13px] text-danger font-medium hover:underline" @click="onRemoveGroup(selected.id)">{{ t('del') }}</button>
           </div>
 
           <!-- Exclusivity -->
           <div class="flex items-center gap-3 text-sm flex-wrap">
-            <label class="text-muted-light dark:text-muted-dark w-[130px]">Exclusive group</label>
+            <label class="text-muted-light dark:text-muted-dark w-[130px]">{{ t('exclusiveGroup') }}</label>
             <input
               v-model="selected.exclusiveTag"
               placeholder="e.g. environment"
               class="w-56 text-[13px] font-mono bg-surface-light dark:bg-surface-dark border border-hairline-light dark:border-[#2E3039] rounded-lg px-3 py-2 outline-none focus:border-brand"
             />
-            <span class="text-xs text-muted-light dark:text-muted-dark">Only one env with this tag is active at a time.</span>
+            <span class="text-xs text-muted-light dark:text-muted-dark">{{ t('exclusiveHint') }}</span>
           </div>
 
           <!-- Condition -->
           <div class="rounded-xl border border-hairline-light dark:border-hairline-dark bg-surface-light dark:bg-surface-dark p-4">
-            <div class="text-[13px] font-bold mb-3.5">Apply to</div>
+            <div class="text-[13px] font-bold mb-3.5">{{ t('applyTo') }}</div>
             <div class="flex items-center gap-3 flex-wrap">
               <div class="flex rounded-lg border border-hairline-light dark:border-[#2E3039] p-0.5">
                 <button
                   v-for="m in MATCH_TYPES"
-                  :key="m.value"
+                  :key="m"
                   class="text-[12.5px] px-3 py-1.5 rounded-md transition-colors"
                   :class="
-                    selected.condition.matchType === m.value
+                    selected.condition.matchType === m
                       ? 'bg-hairline-light dark:bg-hairline-dark font-semibold'
                       : 'text-muted-light dark:text-muted-dark'
                   "
-                  @click="selected.condition.matchType = m.value"
+                  @click="selected.condition.matchType = m"
                 >
-                  {{ m.label }}
+                  {{ matchTypeLabel(m) }}
                 </button>
               </div>
               <input
@@ -470,10 +498,10 @@ function onImportFile(e: Event) {
               v-if="regexError && selected.condition.matchType === 'regexFilter'"
               class="mt-2 text-[11.5px] text-danger"
             >
-              Invalid regex — {{ regexError }}. This group won't be applied until it's fixed.
+              {{ t('invalidRegex', { reason: regexError ?? '' }) }}
             </p>
             <details class="mt-3">
-              <summary class="text-[12.5px] font-semibold text-brand dark:text-[#8FB4FF] cursor-pointer">Advanced — resource types</summary>
+              <summary class="text-[12.5px] font-semibold text-brand dark:text-[#8FB4FF] cursor-pointer">{{ t('advancedResourceTypes') }}</summary>
               <div class="flex flex-wrap gap-2 mt-3">
                 <label
                   v-for="rt in RESOURCE_TYPES"
@@ -488,7 +516,7 @@ function onImportFile(e: Event) {
                   <input type="checkbox" class="sr-only" :checked="(selected.condition.resourceTypes ?? []).includes(rt)" @change="toggleResourceType(rt)" />
                   {{ rt }}
                 </label>
-                <span class="text-[11.5px] text-muted-light dark:text-muted-dark self-center">none selected = all types</span>
+                <span class="text-[11.5px] text-muted-light dark:text-muted-dark self-center">{{ t('noneSelected') }}</span>
               </div>
             </details>
           </div>
@@ -500,9 +528,9 @@ function onImportFile(e: Event) {
           >
             <span class="text-warning text-base leading-tight shrink-0">⚠</span>
             <div>
-              <div class="text-[13px] font-semibold text-warning">Credential headers in use — Authorization, Cookie</div>
+              <div class="text-[13px] font-semibold text-warning">{{ t('credTitle') }}</div>
               <div class="text-[12.5px] text-muted-light dark:text-muted-dark leading-relaxed">
-                These are attached to every matching request. Overhead keeps them on this device only — nothing is uploaded. Double-check the URL condition to avoid sending secrets to unintended hosts.
+                {{ t('credBody') }}
               </div>
             </div>
           </div>
@@ -510,14 +538,14 @@ function onImportFile(e: Event) {
           <!-- Headers -->
           <div>
             <div class="flex items-center justify-between mb-3">
-              <span class="text-[13px] font-bold">Headers</span>
+              <span class="text-[13px] font-bold">{{ t('headers') }}</span>
               <div class="flex items-center gap-2">
                 <div class="relative">
                   <button
                     class="text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-hairline-light dark:border-[#2E3039] hover:border-brand"
                     @click="templatesOpen = !templatesOpen"
                   >
-                    Templates ▾
+                    {{ t('templates') }}
                   </button>
                   <div
                     v-if="templatesOpen"
@@ -539,22 +567,22 @@ function onImportFile(e: Event) {
                   class="text-[11px] text-muted-light dark:text-muted-dark hover:text-brand px-1"
                   @click="setAllHeaders(selected.id, !selected.headers.every((h) => h.enabled))"
                 >
-                  {{ selected.headers.every((h) => h.enabled) ? 'Disable all' : 'Enable all' }}
+                  {{ selected.headers.every((h) => h.enabled) ? t('disableAll') : t('enableAll') }}
                 </button>
-                <button class="text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-hairline-light dark:border-[#2E3039] hover:border-brand" @click="addHeader(selected.id, 'request')">+ Request</button>
-                <button class="text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-hairline-light dark:border-[#2E3039] hover:border-brand" @click="addHeader(selected.id, 'response')">+ Response</button>
+                <button class="text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-hairline-light dark:border-[#2E3039] hover:border-brand" @click="addHeader(selected.id, 'request')">{{ t('addRequest') }}</button>
+                <button class="text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-hairline-light dark:border-[#2E3039] hover:border-brand" @click="addHeader(selected.id, 'response')">{{ t('addResponse') }}</button>
               </div>
             </div>
 
             <div v-if="selected.headers.length === 0" class="text-xs text-muted-light dark:text-muted-dark py-5 text-center border border-dashed border-hairline-light dark:border-hairline-dark rounded-xl">
-              No headers yet. Add a request or response header.
+              {{ t('noHeadersLong') }}
             </div>
 
             <div v-for="h in selected.headers" :key="h.id" class="flex items-center gap-2 mb-2">
               <input type="checkbox" v-model="h.enabled" class="shrink-0 accent-brand w-4 h-4" title="Enable this header" />
               <input
                 v-model="h.label"
-                placeholder="Label (optional)"
+                :placeholder="t('labelOptional')"
                 title="Display-only label — never sent"
                 class="w-36 shrink-0 text-[13px] bg-transparent border border-hairline-light dark:border-[#2E3039] rounded-lg px-2.5 py-2 outline-none focus:border-brand placeholder:text-muted-light/70 dark:placeholder:text-muted-dark/70"
               />
@@ -580,14 +608,14 @@ function onImportFile(e: Event) {
                 placeholder="value"
                 class="flex-1 text-[13px] font-mono bg-canvas-light dark:bg-canvas-dark border border-hairline-light dark:border-[#2E3039] rounded-lg px-3 py-2 outline-none focus:border-brand"
               />
-              <span v-else class="flex-1 text-xs text-muted-light dark:text-muted-dark italic px-2">removes this header</span>
+              <span v-else class="flex-1 text-xs text-muted-light dark:text-muted-dark italic px-2">{{ t('removesHeader') }}</span>
               <button class="text-muted-light dark:text-muted-dark hover:text-danger px-1.5 text-sm" @click="removeHeader(selected.id, h.id)" title="Remove">✕</button>
             </div>
 
             <!-- append validity hints -->
             <template v-for="h in selected.headers" :key="'warn-' + h.id">
               <p v-if="appendInvalid(h)" class="text-[11.5px] text-warning ml-6 mt-1">
-                “{{ h.name }}” can't be appended by Chrome — it will be <b>set</b> instead.
+                {{ t('cantAppend', { name: h.name }) }}
               </p>
             </template>
 
@@ -596,7 +624,7 @@ function onImportFile(e: Event) {
               class="w-full mt-2 py-2 rounded-lg border border-dashed border-hairline-light dark:border-[#3A3C46] text-[13px] font-medium text-muted-light dark:text-muted-dark hover:text-brand hover:border-brand transition-colors"
               @click="addHeader(selected.id, 'request')"
             >
-              + Add header
+              {{ t('addHeader') }}
             </button>
           </div>
         </div>
@@ -608,7 +636,7 @@ function onImportFile(e: Event) {
       class="shrink-0 z-10 flex flex-wrap items-center justify-between gap-2 px-6 py-3 border-t border-hairline-light dark:border-hairline-dark bg-surface-light dark:bg-surface-dark text-[11.5px] text-muted-light dark:text-muted-dark"
     >
       <span>
-        {{ APP.name }}<span v-if="version" class="opacity-70"> v{{ version }}</span> — a
+        {{ APP.name }}<span v-if="version" class="opacity-70"> v{{ version }}</span> ·
         <a
           :href="APP.homepage"
           target="_blank"
@@ -616,11 +644,10 @@ function onImportFile(e: Event) {
           class="font-semibold text-ink-light dark:text-ink-dark hover:text-brand"
           >{{ APP.company }}</a
         >
-        product
       </span>
       <span class="flex items-center gap-4">
         <a :href="APP.repo" target="_blank" rel="noopener" class="hover:text-brand">GitHub</a>
-        <a :href="`${APP.repo}/blob/main/PRIVACY.md`" target="_blank" rel="noopener" class="hover:text-brand">Privacy</a>
+        <a :href="`${APP.repo}/blob/main/PRIVACY.md`" target="_blank" rel="noopener" class="hover:text-brand">{{ t('privacy') }}</a>
       </span>
     </footer>
 
@@ -630,10 +657,31 @@ function onImportFile(e: Event) {
     </datalist>
 
     <!-- Easter-egg game overlay -->
-    <div v-if="gameOpen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/70 p-4">
-      <div class="mb-3 text-sm font-semibold text-white/85">You found it 🎮 — Overhead Stack</div>
-      <StackGame />
-      <button class="mt-4 text-xs text-white/70 hover:text-white" @click="gameOpen = false">Close</button>
+    <div
+      v-if="gameOpen"
+      class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#06070B]/85 backdrop-blur-sm p-4"
+    >
+      <div class="w-[420px] max-w-full mb-3 flex items-center justify-between text-white">
+        <div>
+          <div class="font-mono text-[10px] font-bold tracking-[0.2em] text-[#8FB4FF]">HIDDEN PROTOCOL // 01</div>
+          <div class="mt-1 text-sm font-bold tracking-tight">Overhead Arcade Session</div>
+        </div>
+        <button
+          class="grid h-8 w-8 place-items-center rounded-lg border border-white/15 bg-white/5 text-white/65 transition hover:border-white/30 hover:bg-white/10 hover:text-white"
+          :aria-label="t('close')"
+          @click="gameOpen = false"
+        >
+          ×
+        </button>
+      </div>
+      <StackGame large />
+      <div class="mt-3 flex items-center gap-2 font-mono text-[9px] font-semibold tracking-wider text-white/45">
+        <span class="rounded border border-white/15 bg-white/5 px-2 py-1 text-white/70">SPACE</span>
+        <span>DROP HEADER</span>
+        <span class="mx-1 text-white/20">//</span>
+        <span class="rounded border border-white/15 bg-white/5 px-2 py-1 text-white/70">ENTER</span>
+        <span>RETRY</span>
+      </div>
     </div>
   </div>
 </template>

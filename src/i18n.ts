@@ -1,0 +1,178 @@
+/**
+ * Tiny i18n for the UI. English + German. Auto-detects the browser UI language,
+ * with a manual override (System / English / Deutsch) persisted in settings.
+ * Purely local — no network, no external libs.
+ */
+import { ref } from 'vue';
+
+export type LocalePref = 'system' | 'en' | 'de';
+type Lang = 'en' | 'de';
+
+const en = {
+  active: '{n} active',
+  masterSwitch: 'Master switch',
+  envsClickToActivate: 'Environments — click to activate',
+  clickEnvToStart: 'Click an environment above to start',
+  createFirstEnv: 'Create your first environment',
+  emptyHintEnvs: 'Pick LIVE, DEV or another to edit its headers and apply them.',
+  emptyHintNoEnvs: 'Open the editor to add an environment and its headers.',
+  new: '+ New',
+  templates: 'Templates ▾',
+  add: '+ Add',
+  addHeader: '+ Add header',
+  noHeaders: 'No headers yet.',
+  removed: 'removed',
+  advancedEditor: 'Advanced editor →',
+  support: '♥ Support',
+  youFoundIt: 'You found it 🎮',
+  youFoundItStack: 'You found it 🎮 — Overhead Stack',
+  close: 'Close',
+  tagline: 'The header editor you can actually trust.',
+  themeSystem: 'System',
+  themeLight: 'Light',
+  themeDark: 'Dark',
+  langLabel: 'Language',
+  langSystem: 'System',
+  import: 'Import',
+  export: 'Export',
+  enabled: 'Enabled',
+  disabled: 'Disabled',
+  done: 'Done',
+  importConfig: 'Import configuration',
+  importHint: 'Paste an Overhead or ModHeader export, or choose a file. Imported groups are added disabled.',
+  exportConfig: 'Export configuration',
+  download: 'Download',
+  copy: 'Copy',
+  imported: 'Imported {n} group(s) from {source}.',
+  environments: 'Environments',
+  addEnvironment: '+ Add environment',
+  active2: 'Active',
+  duplicate: 'Duplicate',
+  del: 'Delete',
+  exclusiveGroup: 'Exclusive group',
+  exclusiveHint: 'Only one env with this tag is active at a time.',
+  applyTo: 'Apply to',
+  allUrls: 'All URLs',
+  urlWildcard: 'URL wildcard',
+  urlRegex: 'URL regex',
+  advancedResourceTypes: 'Advanced — resource types',
+  noneSelected: 'none selected = all types',
+  credTitle: 'Credential headers in use — Authorization, Cookie',
+  credBody:
+    'These are attached to every matching request. Overhead keeps them on this device only — nothing is uploaded. Double-check the URL condition to avoid sending secrets to unintended hosts.',
+  headers: 'Headers',
+  enableAll: 'Enable all',
+  disableAll: 'Disable all',
+  addRequest: '+ Request',
+  addResponse: '+ Response',
+  labelOptional: 'Label (optional)',
+  invalidRegex: "Invalid regex — {reason}. This group won't be applied until it's fixed.",
+  cantAppend: '“{name}” can’t be appended by Chrome — it will be set instead.',
+  supportUs: '☕ Support us',
+  supportBody: 'If you find Overhead useful, consider supporting continued development.',
+  everyBit: 'Every bit helps us maintain and improve this tool. — {company}',
+  productLine: '{name} v{version} — a {company} product',
+  privacy: 'Privacy',
+  removesHeader: 'removes this header',
+  selectEnv: 'Select or create an environment to edit its headers.',
+  noHeadersLong: 'No headers yet. Add a request or response header.',
+};
+
+type Keys = keyof typeof en;
+
+const de: Record<Keys, string> = {
+  active: '{n} aktiv',
+  masterSwitch: 'Hauptschalter',
+  envsClickToActivate: 'Umgebungen — zum Aktivieren klicken',
+  clickEnvToStart: 'Klick oben eine Umgebung an',
+  createFirstEnv: 'Erstelle deine erste Umgebung',
+  emptyHintEnvs: 'Wähle LIVE, DEV o. Ä., um ihre Header zu bearbeiten und anzuwenden.',
+  emptyHintNoEnvs: 'Öffne den Editor, um eine Umgebung samt Headern anzulegen.',
+  new: '+ Neu',
+  templates: 'Vorlagen ▾',
+  add: '+ Hinzufügen',
+  addHeader: '+ Header hinzufügen',
+  noHeaders: 'Noch keine Header.',
+  removed: 'entfernt',
+  advancedEditor: 'Erweiterter Editor →',
+  support: '♥ Unterstützen',
+  youFoundIt: 'Gefunden! 🎮',
+  youFoundItStack: 'Gefunden! 🎮 — Overhead Stack',
+  close: 'Schließen',
+  tagline: 'Der Header-Editor, dem du wirklich vertrauen kannst.',
+  themeSystem: 'System',
+  themeLight: 'Hell',
+  themeDark: 'Dunkel',
+  langLabel: 'Sprache',
+  langSystem: 'System',
+  import: 'Import',
+  export: 'Export',
+  enabled: 'Aktiv',
+  disabled: 'Inaktiv',
+  done: 'Fertig',
+  importConfig: 'Konfiguration importieren',
+  importHint:
+    'Füge einen Overhead- oder ModHeader-Export ein oder wähle eine Datei. Importierte Gruppen werden deaktiviert hinzugefügt.',
+  exportConfig: 'Konfiguration exportieren',
+  download: 'Herunterladen',
+  copy: 'Kopieren',
+  imported: '{n} Gruppe(n) aus {source} importiert.',
+  environments: 'Umgebungen',
+  addEnvironment: '+ Umgebung hinzufügen',
+  active2: 'Aktiv',
+  duplicate: 'Duplizieren',
+  del: 'Löschen',
+  exclusiveGroup: 'Exklusiv-Gruppe',
+  exclusiveHint: 'Nur eine Umgebung mit diesem Tag ist gleichzeitig aktiv.',
+  applyTo: 'Anwenden auf',
+  allUrls: 'Alle URLs',
+  urlWildcard: 'URL-Wildcard',
+  urlRegex: 'URL-Regex',
+  advancedResourceTypes: 'Erweitert — Ressourcentypen',
+  noneSelected: 'nichts gewählt = alle Typen',
+  credTitle: 'Zugangsdaten-Header aktiv — Authorization, Cookie',
+  credBody:
+    'Diese werden an jede passende Anfrage angehängt. Overhead behält sie nur auf diesem Gerät — nichts wird hochgeladen. Prüfe die URL-Bedingung, um keine Secrets an fremde Hosts zu senden.',
+  headers: 'Header',
+  enableAll: 'Alle aktivieren',
+  disableAll: 'Alle deaktivieren',
+  addRequest: '+ Request',
+  addResponse: '+ Response',
+  labelOptional: 'Label (optional)',
+  invalidRegex: 'Ungültige Regex — {reason}. Diese Gruppe wird erst angewendet, wenn sie korrigiert ist.',
+  cantAppend: '„{name}“ kann von Chrome nicht angehängt werden — es wird stattdessen gesetzt.',
+  supportUs: '☕ Unterstütze uns',
+  supportBody: 'Wenn dir Overhead hilft, unterstütze gern die Weiterentwicklung.',
+  everyBit: 'Jeder Beitrag hilft uns, das Tool zu pflegen und zu verbessern. — {company}',
+  productLine: '{name} v{version} — ein {company}-Produkt',
+  privacy: 'Datenschutz',
+  removesHeader: 'entfernt diesen Header',
+  selectEnv: 'Wähle oder erstelle eine Umgebung, um ihre Header zu bearbeiten.',
+  noHeadersLong: 'Noch keine Header. Füge einen Request- oder Response-Header hinzu.',
+};
+
+const messages: Record<Lang, Record<Keys, string>> = { en, de };
+
+function detect(): Lang {
+  try {
+    const c = (globalThis as { chrome?: { i18n?: { getUILanguage?: () => string } } }).chrome;
+    const ui = c?.i18n?.getUILanguage?.() || navigator.language || 'en';
+    return ui.toLowerCase().startsWith('de') ? 'de' : 'en';
+  } catch {
+    return 'en';
+  }
+}
+
+// Reactive active language so switching re-renders the UI.
+const lang = ref<Lang>(detect());
+
+export function setLocale(pref: LocalePref) {
+  lang.value = pref === 'system' ? detect() : pref;
+}
+
+/** Translate a key, interpolating {placeholders}. */
+export function t(key: Keys, params?: Record<string, string | number>): string {
+  let s = messages[lang.value][key] ?? messages.en[key] ?? String(key);
+  if (params) for (const [k, v] of Object.entries(params)) s = s.replace(`{${k}}`, String(v));
+  return s;
+}

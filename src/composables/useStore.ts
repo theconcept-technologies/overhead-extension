@@ -10,12 +10,14 @@ import { reactive, ref, watch } from 'vue';
 import { HeaderGroup, HeaderRule, StorageData, ThemePreference } from '../types';
 import { createGroup, createHeaderRule } from '../utils/factory';
 import { getStorageData, setStorageData } from '../utils/storage';
+import { setLocale as applyLocale } from '../i18n';
 
 const state = reactive<StorageData>({
   version: 1,
   enabled: true,
   groups: [],
   theme: 'system',
+  locale: 'system',
 });
 
 const loaded = ref(false);
@@ -36,6 +38,7 @@ export function useStore() {
   async function load() {
     const data = await getStorageData();
     Object.assign(state, data);
+    applyLocale(state.locale);
     loaded.value = true;
     // Persist automatically on any deep change once loaded.
     watch(state, schedulePersist, { deep: true });
@@ -120,6 +123,11 @@ export function useStore() {
     state.theme = theme;
   }
 
+  function setLocale(locale: StorageData['locale']) {
+    state.locale = locale;
+    applyLocale(locale);
+  }
+
   return {
     state,
     loaded,
@@ -135,5 +143,6 @@ export function useStore() {
     setAllHeaders,
     replaceGroups,
     setTheme,
+    setLocale,
   };
 }

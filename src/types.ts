@@ -68,6 +68,8 @@ export interface StorageData {
   enabled: boolean;
   groups: HeaderGroup[];
   theme: ThemePreference;
+  /** UI language: 'system' follows the browser, or force English/German. */
+  locale: 'system' | 'en' | 'de';
 }
 
 export const SCHEMA_VERSION = 1;

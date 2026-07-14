@@ -29,6 +29,7 @@ function seedData(): StorageData {
     enabled: true,
     groups: [live, dev],
     theme: 'system',
+    locale: 'system',
   };
 }
 
@@ -37,6 +38,7 @@ function migrate(data: StorageData): StorageData {
   if (data.version < SCHEMA_VERSION) {
     data = { ...data, version: SCHEMA_VERSION };
   }
+  if (!data.locale) data = { ...data, locale: 'system' };
   return data;
 }
 
