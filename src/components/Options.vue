@@ -30,6 +30,20 @@ const {
 
 const templatesOpen = ref(false);
 const version = appVersion();
+
+/** Close the full editor tab (the quick popup lives on the toolbar icon). */
+function closeEditor() {
+  try {
+    const c = (globalThis as { chrome?: typeof chrome }).chrome;
+    if (c?.tabs?.getCurrent) {
+      c.tabs.getCurrent((t) => (t?.id != null ? c.tabs.remove(t.id) : window.close()));
+      return;
+    }
+  } catch {
+    /* fall through */
+  }
+  window.close();
+}
 function onTemplate(t: HeaderTemplate) {
   if (!selected.value) return;
   insertHeader(selected.value.id, { target: t.target, op: t.op, name: t.name, value: t.value });
@@ -269,6 +283,13 @@ function onImportFile(e: Event) {
             class="w-10 h-[23px] rounded-full bg-hairline-light dark:bg-[#2E3039] peer-checked:bg-brand relative transition-colors after:content-[''] after:absolute after:top-[3px] after:left-[3px] after:w-[17px] after:h-[17px] after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-[17px]"
           ></span>
         </label>
+        <button
+          class="text-xs font-semibold px-3.5 py-1.5 rounded-lg bg-brand text-white hover:bg-brand-hover"
+          title="Close the editor — the quick popup is on your toolbar icon"
+          @click="closeEditor"
+        >
+          Done
+        </button>
       </div>
     </header>
 
