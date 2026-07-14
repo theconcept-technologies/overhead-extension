@@ -63,7 +63,7 @@ const changeListeners: Array<(changes: unknown, area: string) => void> = [];
 (globalThis as unknown as { chrome: unknown }).chrome = {
   runtime: {
     id: 'preview',
-    getManifest: () => ({ version: '0.1.2' }),
+    getManifest: () => ({ version: '0.1.3' }),
     openOptionsPage: () =>
       document.getElementById('options-anchor')?.scrollIntoView({ behavior: 'smooth' }),
   },
