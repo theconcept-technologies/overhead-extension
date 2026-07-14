@@ -561,14 +561,22 @@ function onImportFile(e: Event) {
                 “{{ h.name }}” can't be appended by Chrome — it will be <b>set</b> instead.
               </p>
             </template>
+
+            <!-- Always-visible add affordance below the last row -->
+            <button
+              class="w-full mt-2 py-2 rounded-lg border border-dashed border-hairline-light dark:border-[#3A3C46] text-[13px] font-medium text-muted-light dark:text-muted-dark hover:text-brand hover:border-brand transition-colors"
+              @click="addHeader(selected.id, 'request')"
+            >
+              + Add header
+            </button>
           </div>
         </div>
       </main>
     </div>
 
-    <!-- Footer — product + company -->
+    <!-- Footer — product + company (always visible) -->
     <footer
-      class="flex flex-wrap items-center justify-between gap-2 px-6 py-4 border-t border-hairline-light dark:border-hairline-dark text-[11.5px] text-muted-light dark:text-muted-dark"
+      class="sticky bottom-0 z-10 flex flex-wrap items-center justify-between gap-2 px-6 py-3 border-t border-hairline-light dark:border-hairline-dark bg-canvas-light/95 dark:bg-canvas-dark/95 backdrop-blur text-[11.5px] text-muted-light dark:text-muted-dark"
     >
       <span>
         {{ APP.name }}<span v-if="version" class="opacity-70"> v{{ version }}</span> — a

@@ -241,9 +241,17 @@ function chipText(hex: string): string {
           </div>
         </div>
 
-        <div v-if="g.headers.length === 0" class="text-[11px] text-muted-light dark:text-muted-dark py-1">
-          No headers yet — use <b>+ Add</b> or <b>Templates</b>.
+        <div v-if="g.headers.length === 0" class="text-[11px] text-muted-light dark:text-muted-dark pt-1">
+          No headers yet.
         </div>
+
+        <!-- Always-visible add affordance below the last row -->
+        <button
+          class="w-full mt-1.5 py-1.5 rounded-lg border border-dashed border-hairline-light dark:border-[#3A3C46] text-[11px] font-medium text-muted-light dark:text-muted-dark hover:text-brand hover:border-brand transition-colors"
+          @click="addHeader(g.id, 'request')"
+        >
+          + Add header
+        </button>
       </div>
     </section>
 
