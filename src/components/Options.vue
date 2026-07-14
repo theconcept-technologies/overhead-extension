@@ -369,6 +369,35 @@ function onImportFile(e: Event) {
         >
           + Add environment
         </button>
+
+        <!-- Support / donations -->
+        <div class="mt-5 rounded-xl border border-hairline-light dark:border-hairline-dark p-3">
+          <div class="text-[11px] font-bold uppercase tracking-[0.12em] text-muted-light dark:text-muted-dark mb-1.5">
+            ☕ Support us
+          </div>
+          <p class="text-[11.5px] text-muted-light dark:text-muted-dark leading-relaxed mb-2.5">
+            If you find Overhead useful, consider supporting continued development.
+          </p>
+          <div class="flex flex-col gap-2">
+            <a
+              :href="APP.donate.buyMeACoffee"
+              target="_blank"
+              rel="noopener"
+              class="text-center text-xs font-semibold px-3 py-2 rounded-lg bg-brand text-white hover:bg-brand-hover"
+              >☕ Buy Me a Coffee</a
+            >
+            <a
+              :href="APP.donate.githubSponsors"
+              target="_blank"
+              rel="noopener"
+              class="text-center text-xs font-semibold px-3 py-2 rounded-lg border border-hairline-light dark:border-[#2E3039] hover:border-brand"
+              >💜 GitHub Sponsors</a
+            >
+          </div>
+          <p class="mt-2.5 text-[10.5px] leading-relaxed text-muted-light dark:text-muted-dark">
+            Every bit helps us maintain and improve this tool. — {{ APP.company }}
+          </p>
+        </div>
       </aside>
 
       <!-- Editor -->
