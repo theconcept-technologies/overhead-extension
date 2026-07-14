@@ -74,7 +74,7 @@ const RESOURCE_TYPES: ResourceType[] = [
 ];
 
 const THEMES: ThemePreference[] = ['system', 'light', 'dark'];
-const LOCALES: LocalePref[] = ['system', 'en', 'de'];
+const LOCALES: LocalePref[] = ['en', 'de'];
 const MATCH_TYPES: MatchType[] = ['all', 'urlFilter', 'regexFilter'];
 
 function themeLabel(th: ThemePreference) {
@@ -663,8 +663,8 @@ function onImportFile(e: Event) {
     >
       <div class="w-[420px] max-w-full mb-3 flex items-center justify-between text-white">
         <div>
-          <div class="font-mono text-[10px] font-bold tracking-[0.2em] text-[#8FB4FF]">HIDDEN PROTOCOL // 01</div>
-          <div class="mt-1 text-sm font-bold tracking-tight">Overhead Arcade Session</div>
+          <div class="font-mono text-[10px] font-bold tracking-[0.2em] text-[#8FB4FF]">{{ t('arcadeHiddenProtocol') }}</div>
+          <div class="mt-1 text-sm font-bold tracking-tight">{{ t('arcadeSession') }}</div>
         </div>
         <button
           class="grid h-8 w-8 place-items-center rounded-lg border border-white/15 bg-white/5 text-white/65 transition hover:border-white/30 hover:bg-white/10 hover:text-white"
@@ -677,10 +677,10 @@ function onImportFile(e: Event) {
       <StackGame large />
       <div class="mt-3 flex items-center gap-2 font-mono text-[9px] font-semibold tracking-wider text-white/45">
         <span class="rounded border border-white/15 bg-white/5 px-2 py-1 text-white/70">SPACE</span>
-        <span>DROP HEADER</span>
+        <span>{{ t('arcadeDropHeader') }}</span>
         <span class="mx-1 text-white/20">//</span>
         <span class="rounded border border-white/15 bg-white/5 px-2 py-1 text-white/70">ENTER</span>
-        <span>RETRY</span>
+        <span>{{ t('arcadeRetry') }}</span>
       </div>
     </div>
   </div>

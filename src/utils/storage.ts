@@ -29,7 +29,7 @@ function seedData(): StorageData {
     enabled: true,
     groups: [live, dev],
     theme: 'system',
-    locale: 'system',
+    locale: 'en',
   };
 }
 
@@ -38,7 +38,9 @@ function migrate(data: StorageData): StorageData {
   if (data.version < SCHEMA_VERSION) {
     data = { ...data, version: SCHEMA_VERSION };
   }
-  if (!data.locale) data = { ...data, locale: 'system' };
+  // Older versions used browser auto-detection. English is now the stable
+  // default so the UI never mixes languages on first run.
+  if (!data.locale || data.locale === 'system') data = { ...data, locale: 'en' };
   return data;
 }
 

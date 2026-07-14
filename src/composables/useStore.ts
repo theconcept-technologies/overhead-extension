@@ -17,7 +17,7 @@ const state = reactive<StorageData>({
   enabled: true,
   groups: [],
   theme: 'system',
-  locale: 'system',
+  locale: 'en',
 });
 
 const loaded = ref(false);

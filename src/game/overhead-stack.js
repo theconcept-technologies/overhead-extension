@@ -15,6 +15,8 @@
       startHint: 'Stack headers. Trim overhead. Build a streak.', points: 'PTS', newBest: 'NEW HIGH SCORE',
       phase: 'PHASE', secured: 'CONNECTION SECURED', route: 'ROUTING TO', bonus: 'PHASE BONUS',
       share: 'SHARE', saved: 'SAVED', fever: 'PROTOCOL FEVER', rank: 'RANK',
+      level: 'LEVEL', localSession: 'LOCAL SESSION', shareTagline: 'Stack headers. Trim overhead. Beat the protocol.',
+      milestones: ['HANDSHAKE COMPLETE', 'CACHE ROUTE LOCKED', 'PROTOCOL UPGRADED', 'CLEAN TRANSFER'],
       aria: 'Protocol Stack game. Drop the moving HTTP header with Space or Enter.',
     },
     de: {
@@ -24,14 +26,16 @@
       startHint: 'Header stapeln. Overhead trimmen. Serie bauen.', points: 'PKT', newBest: 'NEUER HIGHSCORE',
       phase: 'PHASE', secured: 'VERBINDUNG STEHT', route: 'WEITER ZU', bonus: 'PHASENBONUS',
       share: 'TEILEN', saved: 'GESPEICHERT', fever: 'PROTOCOL FEVER', rank: 'RANG',
+      level: 'LEVEL', localSession: 'LOKALE SITZUNG', shareTagline: 'Header stapeln. Overhead trimmen. Das Protokoll schlagen.',
+      milestones: ['HANDSHAKE ABGESCHLOSSEN', 'CACHE-ROUTE GESPERRT', 'PROTOKOLL AKTUALISIERT', 'SAUBERE ÜBERTRAGUNG'],
       aria: 'Protocol-Stack-Spiel. Lege den bewegten HTTP-Header mit Leertaste oder Enter ab.',
     },
   };
   const MILESTONES = [
-    { code: '200 OK', label: 'HANDSHAKE COMPLETE' },
-    { code: '304 NOT MODIFIED', label: 'CACHE ROUTE LOCKED' },
-    { code: '101 SWITCHING', label: 'PROTOCOL UPGRADED' },
-    { code: '204 NO CONTENT', label: 'CLEAN TRANSFER' },
+    { code: '200 OK' },
+    { code: '304 NOT MODIFIED' },
+    { code: '101 SWITCHING' },
+    { code: '204 NO CONTENT' },
   ];
   const W = 300, H = 360, BH = 27, BASE_W = 184;
 
@@ -44,7 +48,7 @@
 
   class OverheadStack extends HTMLElement {
     connectedCallback() {
-      this.lang = (navigator.language || 'en').toLowerCase().startsWith('de') ? 'de' : 'en';
+      this.lang = 'en';
       this.copy = COPY[this.lang];
       this.style.display = 'block';
       this.style.width = W + 'px';
@@ -239,7 +243,7 @@
         const phaseBonus = 500 + score * 20;
         this.points += phaseBonus;
         this.scoreEl.textContent = String(this.points).padStart(5, '0');
-        this.milestone = { ...data, number: score / 5 + 1, next: this.modeFor(score), bonus: phaseBonus, until: now + 1300 };
+        this.milestone = { ...data, label: this.copy.milestones[(score / 5 - 1) % this.copy.milestones.length], number: score / 5 + 1, next: this.modeFor(score), bonus: phaseBonus, until: now + 1300 };
         this.freezeUntil = now + 1300;
       }
       this.spawn();
@@ -304,7 +308,7 @@
       ctx.fillRect(116, 484, 970, 1);
       ctx.fillStyle = '#8B8F9C';
       ctx.font = '650 19px ui-sans-serif, system-ui, sans-serif';
-      ctx.fillText('Stack headers. Trim overhead. Beat the protocol.', 116, 530);
+      ctx.fillText(this.copy.shareTagline, 116, 530);
       ctx.textAlign = 'right';
       ctx.fillStyle = '#4E5BF6';
       ctx.font = '850 20px ui-monospace, SFMono-Regular, Menlo, monospace';
@@ -454,7 +458,7 @@
       ctx.fillStyle = 'rgba(255,255,255,.22)';
       ctx.font = '750 7px ui-monospace, SFMono-Regular, Menlo, monospace';
       ctx.textAlign = 'center';
-      ctx.fillText('LEVEL ' + String(Math.floor(score / 5) + 1).padStart(2, '0'), W / 2, 45);
+      ctx.fillText(this.copy.level + ' ' + String(Math.floor(score / 5) + 1).padStart(2, '0'), W / 2, 45);
       ctx.restore();
     }
 
@@ -608,7 +612,7 @@
         ctx.textAlign = 'center';
         ctx.fillStyle = '#8FB4FF';
         ctx.font = '850 10px ui-monospace, SFMono-Regular, Menlo, monospace';
-        ctx.fillText('HTTP/2  ·  LOCAL SESSION', W / 2, 106);
+        ctx.fillText('HTTP/2  ·  ' + this.copy.localSession, W / 2, 106);
         ctx.fillStyle = '#F4F5F7';
         ctx.font = '900 27px ui-sans-serif, system-ui, sans-serif';
         ctx.fillText('PROTOCOL', W / 2, 144);

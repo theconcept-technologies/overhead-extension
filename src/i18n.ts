@@ -1,6 +1,5 @@
 /**
- * Tiny i18n for the UI. English + German. Auto-detects the browser UI language,
- * with a manual override (System / English / Deutsch) persisted in settings.
+ * Tiny i18n for the UI. English is the default; German is an explicit opt-in.
  * Purely local — no network, no external libs.
  */
 import { ref } from 'vue';
@@ -76,6 +75,10 @@ const en = {
   removesHeader: 'removes this header',
   selectEnv: 'Select or create an environment to edit its headers.',
   noHeadersLong: 'No headers yet. Add a request or response header.',
+  arcadeHiddenProtocol: 'HIDDEN PROTOCOL // 01',
+  arcadeSession: 'Overhead Arcade Session',
+  arcadeDropHeader: 'DROP HEADER',
+  arcadeRetry: 'RETRY',
 };
 
 type Keys = keyof typeof en;
@@ -149,25 +152,19 @@ const de: Record<Keys, string> = {
   removesHeader: 'entfernt diesen Header',
   selectEnv: 'Wähle oder erstelle eine Umgebung, um ihre Header zu bearbeiten.',
   noHeadersLong: 'Noch keine Header. Füge einen Request- oder Response-Header hinzu.',
+  arcadeHiddenProtocol: 'VERSTECKTES PROTOKOLL // 01',
+  arcadeSession: 'Overhead Arcade-Sitzung',
+  arcadeDropHeader: 'HEADER ABLEGEN',
+  arcadeRetry: 'NEUSTART',
 };
 
 const messages: Record<Lang, Record<Keys, string>> = { en, de };
 
-function detect(): Lang {
-  try {
-    const c = (globalThis as { chrome?: { i18n?: { getUILanguage?: () => string } } }).chrome;
-    const ui = c?.i18n?.getUILanguage?.() || navigator.language || 'en';
-    return ui.toLowerCase().startsWith('de') ? 'de' : 'en';
-  } catch {
-    return 'en';
-  }
-}
-
 // Reactive active language so switching re-renders the UI.
-const lang = ref<Lang>(detect());
+const lang = ref<Lang>('en');
 
 export function setLocale(pref: LocalePref) {
-  lang.value = pref === 'system' ? detect() : pref;
+  lang.value = pref === 'de' ? 'de' : 'en';
 }
 
 /** Translate a key, interpolating {placeholders}. */
