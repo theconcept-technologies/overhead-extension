@@ -2,7 +2,7 @@
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useStore } from '../composables/useStore';
 import { applyTheme } from '../composables/useTheme';
-import { APP } from '../config';
+import { APP, appVersion } from '../config';
 import { HeaderRule, MatchType, ResourceType, ThemePreference } from '../types';
 import { validateRegex } from '../utils/dnr';
 import { canAppend, isSensitiveHeader } from '../utils/headers';
@@ -29,6 +29,7 @@ const {
 } = useStore();
 
 const templatesOpen = ref(false);
+const version = appVersion();
 function onTemplate(t: HeaderTemplate) {
   if (!selected.value) return;
   insertHeader(selected.value.id, { target: t.target, op: t.op, name: t.name, value: t.value });
@@ -543,6 +544,27 @@ function onImportFile(e: Event) {
         </div>
       </main>
     </div>
+
+    <!-- Footer — product + company -->
+    <footer
+      class="flex flex-wrap items-center justify-between gap-2 px-6 py-4 border-t border-hairline-light dark:border-hairline-dark text-[11.5px] text-muted-light dark:text-muted-dark"
+    >
+      <span>
+        {{ APP.name }}<span v-if="version" class="opacity-70"> v{{ version }}</span> — a
+        <a
+          :href="APP.homepage"
+          target="_blank"
+          rel="noopener"
+          class="font-semibold text-ink-light dark:text-ink-dark hover:text-brand"
+          >{{ APP.company }}</a
+        >
+        product
+      </span>
+      <span class="flex items-center gap-4">
+        <a :href="APP.repo" target="_blank" rel="noopener" class="hover:text-brand">GitHub</a>
+        <a :href="`${APP.repo}/blob/main/PRIVACY.md`" target="_blank" rel="noopener" class="hover:text-brand">Privacy</a>
+      </span>
+    </footer>
 
     <!-- Shared autocomplete source -->
     <datalist id="oh-header-names">

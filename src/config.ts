@@ -6,6 +6,7 @@ export const APP = {
   name: 'Overhead',
   tagline: 'The header editor you can actually trust.',
   storageKey: 'overhead', // top-level chrome.storage.local key
+  company: 'theconcept technologies',
   homepage: 'https://theconcept-technologies.com',
   repo: 'https://github.com/theconcept-technologies/overhead-extension',
   donate: {
@@ -13,3 +14,13 @@ export const APP = {
     githubSponsors: 'https://github.com/sponsors/theconcept-technologies',
   },
 } as const;
+
+/** Live version from the manifest (always matches what's installed). */
+export function appVersion(): string {
+  try {
+    const c = (globalThis as { chrome?: { runtime?: { getManifest?: () => { version?: string } } } }).chrome;
+    return c?.runtime?.getManifest?.().version ?? '';
+  } catch {
+    return '';
+  }
+}

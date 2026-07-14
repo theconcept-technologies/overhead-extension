@@ -2,7 +2,7 @@
 import { computed, onMounted, ref } from 'vue';
 import { useStore } from '../composables/useStore';
 import { applyTheme } from '../composables/useTheme';
-import { APP } from '../config';
+import { APP, appVersion } from '../config';
 import { HeaderOp, HeaderRule } from '../types';
 import { isSensitiveHeader } from '../utils/headers';
 import { COMMON_HEADER_NAMES, HEADER_TEMPLATES, HeaderTemplate } from '../utils/headerCatalog';
@@ -15,6 +15,7 @@ const { state, loaded, load, toggleMaster, toggleGroup, addHeader, insertHeader,
   useStore();
 const showSponsor = ref(false);
 const templatesForGroup = ref<string | null>(null);
+const version = appVersion();
 
 // Easter egg: click the logo 7× to make the bars dance + open the game.
 const dancing = ref(false);
@@ -249,18 +250,24 @@ function chipText(hex: string): string {
     <!-- Footer -->
     <footer
       v-if="!gameOpen"
-      class="flex items-center justify-between px-4 py-3 border-t border-hairline-light dark:border-hairline-dark text-xs"
+      class="px-4 py-2.5 border-t border-hairline-light dark:border-hairline-dark text-xs"
     >
-      <button class="font-semibold text-brand dark:text-[#8FB4FF] hover:underline" @click="openOptions">
-        Advanced editor →
-      </button>
-      <a
-        :href="APP.donate.buyMeACoffee"
-        target="_blank"
-        rel="noopener"
-        class="text-muted-light dark:text-muted-dark hover:text-brand"
-        >♥ Support</a
-      >
+      <div class="flex items-center justify-between">
+        <button class="font-semibold text-brand dark:text-[#8FB4FF] hover:underline" @click="openOptions">
+          Advanced editor →
+        </button>
+        <a
+          :href="APP.donate.buyMeACoffee"
+          target="_blank"
+          rel="noopener"
+          class="text-muted-light dark:text-muted-dark hover:text-brand"
+          >♥ Support</a
+        >
+      </div>
+      <div class="mt-1.5 text-center text-[10px] text-muted-light dark:text-muted-dark">
+        <a :href="APP.homepage" target="_blank" rel="noopener" class="hover:text-brand">{{ APP.company }}</a>
+        <span v-if="version"> · v{{ version }}</span>
+      </div>
     </footer>
 
     <!-- Easter-egg game (inline & compact so the popup never scrolls) -->
