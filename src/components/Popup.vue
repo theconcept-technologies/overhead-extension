@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useStore } from '../composables/useStore';
 import { applyTheme } from '../composables/useTheme';
 import { APP, appVersion } from '../config';
@@ -17,16 +17,39 @@ const showSponsor = ref(false);
 const templatesForGroup = ref<string | null>(null);
 const version = appVersion();
 
-// Easter egg: click the logo 7× to make the bars dance + open the game.
+// Easter egg: click the logo 7× OR key the Konami code to open the game.
 const dancing = ref(false);
 const gameOpen = ref(false);
 let logoClicks = 0;
 let logoTimer: ReturnType<typeof setTimeout> | undefined;
+const KONAMI = [
+  'ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
+  'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a',
+];
+let konamiProgress = 0;
+
+function triggerEasterEgg() {
+  dancing.value = true;
+  gameOpen.value = true;
+  setTimeout(() => (dancing.value = false), 1800);
+}
+
+function onKey(e: KeyboardEvent) {
+  const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+  konamiProgress = k === KONAMI[konamiProgress] ? konamiProgress + 1 : k === KONAMI[0] ? 1 : 0;
+  if (konamiProgress === KONAMI.length) {
+    konamiProgress = 0;
+    triggerEasterEgg();
+  }
+}
 
 onMounted(async () => {
   await load();
   applyTheme(() => state.theme);
+  window.addEventListener('keydown', onKey);
 });
+
+onUnmounted(() => window.removeEventListener('keydown', onKey));
 
 const activeGroups = computed(() => state.groups.filter((g) => g.enabled));
 const activeCount = computed(() =>
@@ -64,9 +87,7 @@ function onLogoClick() {
   logoTimer = setTimeout(() => (logoClicks = 0), 1200);
   if (logoClicks >= 7) {
     logoClicks = 0;
-    dancing.value = true;
-    gameOpen.value = true;
-    setTimeout(() => (dancing.value = false), 1800);
+    triggerEasterEgg();
   }
 }
 
