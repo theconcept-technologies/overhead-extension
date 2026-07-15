@@ -109,3 +109,25 @@ until the first review finishes. So:
 build carry the nicer icon + fixes, you can try replacing the pending package: in the dashboard open
 the still-in-review item and upload `overhead-v0.1.1.zip` over it. If the dashboard won't let you
 replace a package that's already in review, fall back to the update flow above once 0.1.0 clears.
+
+## Firefox (addons.mozilla.org / AMO)
+
+**Build:** `npm run build:firefox` → `overhead-firefox-v<version>.zip` (also attached to the GitHub
+release). It uses a Firefox-specific manifest: event-page background (`background.scripts`, module),
+`browser_specific_settings.gecko` (id `overhead@theconcept-technologies.com`,
+`strict_min_version: 128.0`, `data_collection_permissions: { required: ["none"] }`), and no
+`minimum_chrome_version`.
+
+**Compatibility:** the header engine (declarativeNetRequest `modifyHeaders`, request + response,
+dynamic rules) is supported by Firefox 128+. `web-ext lint` reports **0 errors**; the warnings are
+non-blocking (static `innerHTML` in the easter-egg game, and the data-collection key being ignored
+below FF 140/142).
+
+**Submit:**
+1. Create a free developer account at <https://addons.mozilla.org/developers/> (no fee, unlike Chrome).
+2. Submit a new add-on → upload `overhead-firefox-v<version>.zip` → choose "On this site (AMO)".
+3. Reuse the same listing copy, screenshots, and privacy answers as the Chrome listing
+   (privacy policy URL, "does not collect data").
+4. Submit for review — AMO signs and publishes (usually faster than the Chrome Web Store).
+
+**Data-collection consent:** we declare `required: ["none"]` — Overhead collects nothing.
