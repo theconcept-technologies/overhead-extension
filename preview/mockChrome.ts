@@ -63,7 +63,7 @@ const changeListeners: Array<(changes: unknown, area: string) => void> = [];
 (globalThis as unknown as { chrome: unknown }).chrome = {
   runtime: {
     id: 'preview',
-    getManifest: () => ({ version: '0.1.3' }),
+    getManifest: () => ({ version: '0.1.4' }),
     openOptionsPage: () =>
       document.getElementById('options-anchor')?.scrollIntoView({ behavior: 'smooth' }),
   },
@@ -88,4 +88,11 @@ const changeListeners: Array<(changes: unknown, area: string) => void> = [];
     onChanged: { addListener: (cb: (changes: unknown, area: string) => void) => changeListeners.push(cb) },
   },
   action: { setBadgeText() {}, setBadgeBackgroundColor() {}, setTitle() {} },
+  // Pretend the open tab is example.com so the "on this page" highlight is visible.
+  tabs: {
+    query: async () => [{ id: 1, url: 'https://example.com/products', active: true }],
+    get: async () => ({ id: 1, url: 'https://example.com/products' }),
+    onActivated: { addListener() {} },
+    onUpdated: { addListener() {} },
+  },
 };

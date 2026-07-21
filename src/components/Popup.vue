@@ -4,8 +4,9 @@ import { useStore } from '../composables/useStore';
 import { applyTheme } from '../composables/useTheme';
 import { APP, appVersion } from '../config';
 import { t } from '../i18n';
-import { HeaderOp, HeaderRule } from '../types';
+import { HeaderGroup, HeaderOp, HeaderRule } from '../types';
 import { isSensitiveHeader } from '../utils/headers';
+import { matchesUrl } from '../utils/urlMatch';
 import { COMMON_HEADER_NAMES, HEADER_TEMPLATES, HeaderTemplate } from '../utils/headerCatalog';
 import { recordActivation } from '../utils/sponsorStorage';
 import SponsorOverlay from './SponsorOverlay.vue';
@@ -44,20 +45,34 @@ function onKey(e: KeyboardEvent) {
   }
 }
 
+const currentUrl = ref('');
+
 onMounted(async () => {
   await load();
   applyTheme(() => state.theme);
   window.addEventListener('keydown', onKey);
+  try {
+    const tabs = await chrome?.tabs?.query?.({ active: true, currentWindow: true });
+    currentUrl.value = tabs?.[0]?.url ?? '';
+  } catch {
+    /* tabs API unavailable (e.g. the dev preview) */
+  }
 });
 
 onUnmounted(() => window.removeEventListener('keydown', onKey));
 
 const activeGroups = computed(() => state.groups.filter((g) => g.enabled));
+
+/** Does an environment's URL condition match the currently open tab? */
+function onThisPage(g: HeaderGroup): boolean {
+  return matchesUrl(g.condition, currentUrl.value);
+}
+
+// Header count for THIS page — only groups whose URL condition matches the tab.
 const activeCount = computed(() =>
-  activeGroups.value.reduce(
-    (n, g) => n + g.headers.filter((h) => h.enabled && h.name.trim()).length,
-    0
-  )
+  activeGroups.value
+    .filter((g) => onThisPage(g))
+    .reduce((n, g) => n + g.headers.filter((h) => h.enabled && h.name.trim()).length, 0)
 );
 
 async function onChipClick(groupId: string, currentlyEnabled: boolean) {
@@ -154,6 +169,7 @@ function chipText(hex: string): string {
             g.enabled
               ? 'border-transparent shadow-sm'
               : 'bg-surface-light dark:bg-[#1B1C23] text-muted-light dark:text-muted-dark border-hairline-light dark:border-[#2E3039]',
+            g.enabled && state.enabled && onThisPage(g) && 'ring-2 ring-offset-2 ring-offset-surface-light dark:ring-offset-surface-dark ring-brand',
             !state.enabled && 'opacity-50',
           ]"
           :style="g.enabled ? { backgroundColor: g.color, color: chipText(g.color) } : {}"
@@ -192,10 +208,14 @@ function chipText(hex: string): string {
       <div v-for="g in activeGroups" :key="g.id" class="mb-3">
         <div class="flex items-center gap-2 mb-1.5">
           <span class="relative inline-flex w-2 h-2">
-            <span class="absolute inline-flex h-full w-full rounded-full opacity-60 animate-ping" :style="{ backgroundColor: g.color }"></span>
+            <span v-if="onThisPage(g)" class="absolute inline-flex h-full w-full rounded-full opacity-60 animate-ping" :style="{ backgroundColor: g.color }"></span>
             <span class="relative inline-flex rounded-full w-2 h-2" :style="{ backgroundColor: g.color }"></span>
           </span>
           <span class="text-xs font-bold">{{ g.name }}</span>
+          <span
+            class="text-[9px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded-full"
+            :class="onThisPage(g) ? 'bg-brand-tint text-brand dark:bg-[#1C2140] dark:text-[#8FB4FF]' : 'bg-hairline-light dark:bg-[#24262E] text-muted-light dark:text-muted-dark'"
+          >{{ onThisPage(g) ? t('onThisPage') : t('notThisPage') }}</span>
           <span class="ml-auto flex items-center gap-2">
             <button
               class="text-[11px] font-medium text-muted-light dark:text-muted-dark hover:text-brand"

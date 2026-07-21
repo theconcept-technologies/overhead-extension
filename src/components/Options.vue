@@ -75,7 +75,7 @@ const RESOURCE_TYPES: ResourceType[] = [
 
 const THEMES: ThemePreference[] = ['system', 'light', 'dark'];
 const LOCALES: LocalePref[] = ['en', 'de'];
-const MATCH_TYPES: MatchType[] = ['all', 'urlFilter', 'regexFilter'];
+const MATCH_TYPES: MatchType[] = ['all', 'urlFilter', 'regexFilter', 'urls'];
 
 function themeLabel(th: ThemePreference) {
   return th === 'light' ? t('themeLight') : th === 'dark' ? t('themeDark') : t('themeSystem');
@@ -84,7 +84,34 @@ function localeLabel(l: LocalePref) {
   return l === 'en' ? 'English' : l === 'de' ? 'Deutsch' : t('langSystem');
 }
 function matchTypeLabel(m: MatchType) {
-  return m === 'all' ? t('allUrls') : m === 'urlFilter' ? t('urlWildcard') : t('urlRegex');
+  return m === 'all'
+    ? t('allUrls')
+    : m === 'urlFilter'
+      ? t('urlWildcard')
+      : m === 'urls'
+        ? t('urlList')
+        : t('urlRegex');
+}
+
+function setMatchType(m: MatchType) {
+  const g = selected.value;
+  if (!g) return;
+  g.condition.matchType = m;
+  if (m === 'urls' && (!g.condition.patterns || g.condition.patterns.length === 0)) {
+    g.condition.patterns = [''];
+  }
+}
+function addUrl() {
+  const g = selected.value;
+  if (!g) return;
+  if (!g.condition.patterns) g.condition.patterns = [];
+  g.condition.patterns.push('');
+}
+function removeUrl(i: number) {
+  const g = selected.value;
+  if (!g?.condition.patterns) return;
+  g.condition.patterns.splice(i, 1);
+  if (g.condition.patterns.length === 0) g.condition.patterns.push('');
 }
 
 // Easter egg: Konami code (↑↑↓↓←→←→ b a) or clicking the logo 7× unlocks the
@@ -481,18 +508,47 @@ function onImportFile(e: Event) {
                       ? 'bg-hairline-light dark:bg-hairline-dark font-semibold'
                       : 'text-muted-light dark:text-muted-dark'
                   "
-                  @click="selected.condition.matchType = m"
+                  @click="setMatchType(m)"
                 >
                   {{ matchTypeLabel(m) }}
                 </button>
               </div>
               <input
-                v-if="selected.condition.matchType !== 'all'"
+                v-if="selected.condition.matchType === 'urlFilter' || selected.condition.matchType === 'regexFilter'"
                 v-model="selected.condition.pattern"
                 :placeholder="selected.condition.matchType === 'regexFilter' ? '^https://api\\.example\\.com/.*' : 'https://api.myapp.com/*'"
                 class="flex-1 min-w-[220px] text-[13px] font-mono bg-canvas-light dark:bg-canvas-dark border rounded-lg px-3 py-2 outline-none focus:border-brand"
                 :class="regexError && selected.condition.matchType === 'regexFilter' ? 'border-danger' : 'border-hairline-light dark:border-[#2E3039]'"
               />
+            </div>
+
+            <!-- URL list mode: multiple wildcard URLs -->
+            <div v-if="selected.condition.matchType === 'urls'" class="mt-3 space-y-2">
+              <div
+                v-for="(u, i) in (selected.condition.patterns ?? [])"
+                :key="i"
+                class="flex items-center gap-2"
+              >
+                <input
+                  v-model="selected.condition.patterns[i]"
+                  placeholder="https://api.example.com/*"
+                  class="flex-1 min-w-0 text-[13px] font-mono bg-canvas-light dark:bg-canvas-dark border border-hairline-light dark:border-[#2E3039] rounded-lg px-3 py-2 outline-none focus:border-brand"
+                />
+                <button
+                  class="shrink-0 text-muted-light dark:text-muted-dark hover:text-danger px-1.5 text-sm"
+                  title="Remove"
+                  @click="removeUrl(i)"
+                >✕</button>
+              </div>
+              <div class="flex items-center gap-3 flex-wrap">
+                <button
+                  class="text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-dashed border-hairline-light dark:border-[#3A3C46] text-muted-light dark:text-muted-dark hover:text-brand hover:border-brand"
+                  @click="addUrl"
+                >
+                  {{ t('addUrl') }}
+                </button>
+                <span class="text-[11.5px] text-muted-light dark:text-muted-dark">{{ t('urlsHint') }}</span>
+              </div>
             </div>
             <p
               v-if="regexError && selected.condition.matchType === 'regexFilter'"

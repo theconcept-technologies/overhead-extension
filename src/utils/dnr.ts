@@ -56,23 +56,34 @@ function buildHeaderInfos(
   return infos;
 }
 
-function buildCondition(
+/**
+ * A group can yield several DNR conditions — the 'urls' mode emits one condition
+ * per wildcard pattern so a group can match a list of sites.
+ */
+function buildConditions(
   group: HeaderGroup
-): chrome.declarativeNetRequest.RuleCondition {
+): chrome.declarativeNetRequest.RuleCondition[] {
   const resourceTypes = (
     group.condition.resourceTypes && group.condition.resourceTypes.length > 0
       ? group.condition.resourceTypes
       : ALL_RESOURCE_TYPES
   ) as chrome.declarativeNetRequest.ResourceType[];
 
+  const mt = group.condition.matchType;
+  if (mt === 'urls') {
+    const pats = (group.condition.patterns ?? []).map((p) => p.trim()).filter(Boolean);
+    // An empty URL list intentionally matches nothing (no rules emitted).
+    return pats.map((p) => ({ resourceTypes, urlFilter: p }));
+  }
+
   const condition: chrome.declarativeNetRequest.RuleCondition = { resourceTypes };
-  const pattern = group.condition.pattern.trim();
-  if (group.condition.matchType === 'urlFilter' && pattern) {
+  const pattern = (group.condition.pattern ?? '').trim();
+  if (mt === 'urlFilter' && pattern) {
     condition.urlFilter = pattern;
-  } else if (group.condition.matchType === 'regexFilter' && pattern) {
+  } else if (mt === 'regexFilter' && pattern) {
     condition.regexFilter = pattern;
   }
-  return condition;
+  return [condition];
 }
 
 /**
@@ -96,12 +107,9 @@ export function compileRules(data: StorageData): Rule[] {
     if (requestHeaders.length) action.requestHeaders = requestHeaders;
     if (responseHeaders.length) action.responseHeaders = responseHeaders;
 
-    rules.push({
-      id: id++,
-      priority: 1,
-      action,
-      condition: buildCondition(group),
-    });
+    for (const condition of buildConditions(group)) {
+      rules.push({ id: id++, priority: 1, action, condition });
+    }
   }
 
   return rules;

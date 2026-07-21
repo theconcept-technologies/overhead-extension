@@ -79,6 +79,11 @@ const en = {
   arcadeSession: 'Overhead Arcade Session',
   arcadeDropHeader: 'DROP HEADER',
   arcadeRetry: 'RETRY',
+  onThisPage: 'on this page',
+  notThisPage: 'not here',
+  urlList: 'URL list',
+  addUrl: '+ Add URL',
+  urlsHint: 'Applies if any of these URLs matches the page.',
 };
 
 type Keys = keyof typeof en;
@@ -156,6 +161,11 @@ const de: Record<Keys, string> = {
   arcadeSession: 'Overhead Arcade-Sitzung',
   arcadeDropHeader: 'HEADER ABLEGEN',
   arcadeRetry: 'NEUSTART',
+  onThisPage: 'auf dieser Seite',
+  notThisPage: 'nicht hier',
+  urlList: 'URL-Liste',
+  addUrl: '+ URL hinzufügen',
+  urlsHint: 'Trifft zu, wenn eine dieser URLs zur Seite passt.',
 };
 
 const messages: Record<Lang, Record<Keys, string>> = { en, de };

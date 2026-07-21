@@ -37,12 +37,14 @@ export interface HeaderRule {
   label?: string;
 }
 
-export type MatchType = 'all' | 'urlFilter' | 'regexFilter';
+export type MatchType = 'all' | 'urlFilter' | 'regexFilter' | 'urls';
 
 export interface GroupCondition {
   matchType: MatchType;
   /** urlFilter (Chrome wildcard syntax) or a RE2 regex, depending on matchType. */
   pattern: string;
+  /** For matchType 'urls': a list of wildcard patterns — the group matches if any hits. */
+  patterns?: string[];
   /** Empty/undefined = all resource types. */
   resourceTypes?: ResourceType[];
 }
