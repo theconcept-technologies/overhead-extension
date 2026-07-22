@@ -126,6 +126,8 @@ const KONAMI = [
   'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a',
 ];
 const TETRIS = 'tetris';
+const TEAPOT = 'teapot';
+const teapotOpen = ref(false);
 let konamiProgress = 0;
 let typedBuffer = '';
 let logoClicks = 0;
@@ -151,12 +153,20 @@ function onKey(e: KeyboardEvent) {
     konamiProgress = 0;
     unlock();
   }
-  // Rolling buffer for the typed "tetris" trigger (letters only).
+  // Rolling buffer for typed triggers (letters only): "tetris" → Headerfall,
+  // "teapot" → the 418 arcade index.
   if (k.length === 1 && k >= 'a' && k <= 'z') {
-    typedBuffer = (typedBuffer + k).slice(-TETRIS.length);
-    if (typedBuffer === TETRIS && !headerfallOpen.value) {
+    typedBuffer = (typedBuffer + k).slice(-Math.max(TETRIS.length, TEAPOT.length));
+    if (typedBuffer.endsWith(TETRIS) && !headerfallOpen.value) {
       typedBuffer = '';
       unlockHeaderfall();
+    } else if (typedBuffer.endsWith(TEAPOT) && !teapotOpen.value) {
+      typedBuffer = '';
+      dancing.value = true;
+      gameOpen.value = false;
+      headerfallOpen.value = false;
+      teapotOpen.value = true;
+      setTimeout(() => (dancing.value = false), 1800);
     }
   }
 }
@@ -791,6 +801,37 @@ function onImportFile(e: Event) {
         <span class="mx-1 text-white/20">//</span>
         <span class="rounded border border-white/15 bg-white/5 px-2 py-1 text-white/70">P</span>
         <span>{{ t('headerfallPause') }}</span>
+      </div>
+    </div>
+
+    <!-- 418 easter egg: the hidden arcade index (typed "teapot") -->
+    <div
+      v-if="teapotOpen"
+      class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#06070B]/85 backdrop-blur-sm p-4"
+    >
+      <div class="w-[340px] max-w-full rounded-2xl border border-white/10 bg-[#0C0D11] p-6 text-center shadow-2xl">
+        <div class="font-mono text-[10px] font-bold tracking-[0.2em] text-[#8FB4FF]">{{ t('teapotProtocol') }}</div>
+        <div class="mt-4 text-5xl leading-none">🫖</div>
+        <div class="mt-3 font-mono text-2xl font-extrabold text-warning">418</div>
+        <div class="mt-1 text-sm font-bold text-white">{{ t('teapotTitle') }}</div>
+        <p class="mt-2 text-xs leading-relaxed text-white/55">{{ t('teapotBody') }}</p>
+        <div class="mt-5 flex flex-col gap-2">
+          <button
+            class="w-full rounded-lg bg-brand px-3 py-2 text-xs font-semibold text-white hover:bg-brand-hover"
+            @click="teapotOpen = false; gameOpen = true"
+          >
+            🧱 {{ t('teapotPlayStack') }}
+          </button>
+          <button
+            class="w-full rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold text-white/85 hover:border-white/30 hover:bg-white/10"
+            @click="teapotOpen = false; headerfallOpen = true"
+          >
+            🧩 {{ t('teapotPlayHeaderfall') }}
+          </button>
+          <button class="mt-1 text-xs text-white/45 hover:text-white/80" @click="teapotOpen = false">
+            {{ t('teapotBackToWork') }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
