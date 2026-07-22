@@ -11,6 +11,7 @@ import { COMMON_HEADER_NAMES, HEADER_TEMPLATES, HeaderTemplate } from '../utils/
 import { exportGroups, parseImport } from '../utils/importExport';
 import MarkLogo from './MarkLogo.vue';
 import StackGame from './StackGame.vue';
+import HeaderfallGame from './HeaderfallGame.vue';
 
 const {
   state,
@@ -114,15 +115,19 @@ function removeUrl(i: number) {
   if (g.condition.patterns.length === 0) g.condition.patterns.push('');
 }
 
-// Easter egg: Konami code (↑↑↓↓←→←→ b a) or clicking the logo 7× unlocks the
-// equalizer dance + the Stack game.
+// Easter eggs: Konami code (↑↑↓↓←→←→ b a) or clicking the logo 7× unlocks the
+// equalizer dance + the Stack game. Typing "tetris" anywhere unlocks the deep
+// cut — Headerfall, the falling-block puzzle made of HTTP headers.
 const dancing = ref(false);
 const gameOpen = ref(false);
+const headerfallOpen = ref(false);
 const KONAMI = [
   'ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
   'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a',
 ];
+const TETRIS = 'tetris';
 let konamiProgress = 0;
+let typedBuffer = '';
 let logoClicks = 0;
 let logoTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -132,12 +137,27 @@ function unlock() {
   setTimeout(() => (dancing.value = false), 1800);
 }
 
+function unlockHeaderfall() {
+  dancing.value = true;
+  gameOpen.value = false;
+  headerfallOpen.value = true;
+  setTimeout(() => (dancing.value = false), 1800);
+}
+
 function onKey(e: KeyboardEvent) {
   const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
   konamiProgress = k === KONAMI[konamiProgress] ? konamiProgress + 1 : k === KONAMI[0] ? 1 : 0;
   if (konamiProgress === KONAMI.length) {
     konamiProgress = 0;
     unlock();
+  }
+  // Rolling buffer for the typed "tetris" trigger (letters only).
+  if (k.length === 1 && k >= 'a' && k <= 'z') {
+    typedBuffer = (typedBuffer + k).slice(-TETRIS.length);
+    if (typedBuffer === TETRIS && !headerfallOpen.value) {
+      typedBuffer = '';
+      unlockHeaderfall();
+    }
   }
 }
 
@@ -737,6 +757,40 @@ function onImportFile(e: Event) {
         <span class="mx-1 text-white/20">//</span>
         <span class="rounded border border-white/15 bg-white/5 px-2 py-1 text-white/70">ENTER</span>
         <span>{{ t('arcadeRetry') }}</span>
+      </div>
+    </div>
+
+    <!-- Deep-cut easter egg: Headerfall (typed "tetris") -->
+    <div
+      v-if="headerfallOpen"
+      class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#06070B]/85 backdrop-blur-sm p-4 overflow-y-auto"
+    >
+      <div class="w-[330px] max-w-full mb-3 flex items-center justify-between text-white">
+        <div>
+          <div class="font-mono text-[10px] font-bold tracking-[0.2em] text-[#8FB4FF]">{{ t('headerfallProtocol') }}</div>
+          <div class="mt-1 text-sm font-bold tracking-tight">{{ t('headerfallTitle') }}</div>
+        </div>
+        <button
+          class="grid h-8 w-8 place-items-center rounded-lg border border-white/15 bg-white/5 text-white/65 transition hover:border-white/30 hover:bg-white/10 hover:text-white"
+          :aria-label="t('close')"
+          @click="headerfallOpen = false"
+        >
+          ×
+        </button>
+      </div>
+      <HeaderfallGame />
+      <div class="mt-3 flex items-center gap-2 font-mono text-[9px] font-semibold tracking-wider text-white/45">
+        <span class="rounded border border-white/15 bg-white/5 px-2 py-1 text-white/70">← →</span>
+        <span>{{ t('headerfallMove') }}</span>
+        <span class="mx-1 text-white/20">//</span>
+        <span class="rounded border border-white/15 bg-white/5 px-2 py-1 text-white/70">↑</span>
+        <span>{{ t('headerfallRotate') }}</span>
+        <span class="mx-1 text-white/20">//</span>
+        <span class="rounded border border-white/15 bg-white/5 px-2 py-1 text-white/70">C</span>
+        <span>{{ t('headerfallHold') }}</span>
+        <span class="mx-1 text-white/20">//</span>
+        <span class="rounded border border-white/15 bg-white/5 px-2 py-1 text-white/70">P</span>
+        <span>{{ t('headerfallPause') }}</span>
       </div>
     </div>
   </div>

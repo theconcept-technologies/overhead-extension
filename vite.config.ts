@@ -53,8 +53,8 @@ export default defineConfig({
   plugins: [
     vue({
       template: {
-        // Let Vue treat the easter-egg game element as a custom element.
-        compilerOptions: { isCustomElement: (tag) => tag === 'overhead-stack' },
+        // Let Vue treat the easter-egg game elements as custom elements.
+        compilerOptions: { isCustomElement: (tag) => tag === 'overhead-stack' || tag === 'overhead-drop' },
       },
     }),
     copyAssetsPlugin(),
