@@ -1,6 +1,83 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Only scan src/ for class names (not docs, scripts or the dev preview). */
+@import 'tailwindcss' source('.');
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --color-brand: #4e5bf6;
+  --color-brand-hover: #3d49e0;
+  --color-brand-tint: #eef0ff;
+
+  --color-surface-light: #ffffff;
+  --color-surface-dark: #16171d;
+
+  --color-canvas-light: #fafafb;
+  --color-canvas-dark: #0c0d11;
+
+  --color-hairline-light: #e7e8ec;
+  --color-hairline-dark: #26272f;
+
+  --color-ink-light: #141519;
+  --color-ink-dark: #f4f5f7;
+
+  --color-muted-light: #6b6e7a;
+  --color-muted-dark: #9a9dab;
+
+  --color-success: #30a46c;
+  --color-warning: #f5a623;
+  --color-danger: #e5484d;
+
+  /* v3 line-heights were absolute (rem), so children with an arbitrary
+     text-[Npx] size inherited e.g. 20px from text-sm. v4 uses unitless
+     ratios instead, which shrinks those rows — pin the v3 values. */
+  --text-xs--line-height: 1rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl--line-height: 1.75rem;
+  --text-2xl--line-height: 2rem;
+  --text-3xl--line-height: 2.25rem;
+  --text-4xl--line-height: 2.5rem;
+
+  --font-sans: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  --font-mono:
+    JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+
+  /* Tailwind v4 dropped these v3 Preflight defaults — keep the v3 look & feel. */
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-gray-400);
+  }
+
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+
+  /* v4 Preflight strips the native "Choose file" button; v3 left it alone. */
+  ::file-selector-button {
+    all: revert;
+    font: inherit;
+  }
+}
 
 :root {
   color-scheme: light dark;
@@ -75,7 +152,7 @@ body {
   height: 8px;
 }
 *::-webkit-scrollbar-thumb {
-  @apply rounded bg-hairline-light;
+  @apply rounded-sm bg-hairline-light;
 }
 .dark *::-webkit-scrollbar-thumb {
   @apply bg-hairline-dark;

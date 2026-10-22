@@ -303,7 +303,7 @@ function onImportFile(e: Event) {
       class="shrink-0 z-10 flex items-center justify-between px-6 py-3 border-b border-hairline-light dark:border-hairline-dark bg-surface-light dark:bg-surface-dark"
     >
       <div class="flex items-center gap-3">
-        <button class="flex items-center rounded-md focus:outline-none" title="Overhead" @click="onLogoClick">
+        <button class="flex items-center rounded-md focus:outline-hidden" title="Overhead" @click="onLogoClick">
           <MarkLogo :size="26" :dancing="dancing" />
         </button>
         <div class="flex flex-col leading-tight">
@@ -365,7 +365,7 @@ function onImportFile(e: Event) {
             @change="toggleMaster(($event.target as HTMLInputElement).checked)"
           />
           <span
-            class="w-10 h-[23px] rounded-full bg-hairline-light dark:bg-[#2E3039] peer-checked:bg-brand relative transition-colors after:content-[''] after:absolute after:top-[3px] after:left-[3px] after:w-[17px] after:h-[17px] after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-[17px]"
+            class="w-10 h-[23px] rounded-full bg-hairline-light dark:bg-[#2E3039] peer-checked:bg-brand dark:peer-checked:bg-brand relative transition-colors after:content-[''] after:absolute after:top-[3px] after:left-[3px] after:w-[17px] after:h-[17px] after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-[17px]"
           ></span>
         </label>
         <button
@@ -391,7 +391,7 @@ function onImportFile(e: Event) {
         v-model="importText"
         rows="5"
         placeholder="Paste JSON here…"
-        class="w-full text-xs font-mono p-2.5 rounded-lg border border-hairline-light dark:border-[#2E3039] bg-canvas-light dark:bg-canvas-dark outline-none focus:border-brand"
+        class="w-full text-xs font-mono p-2.5 rounded-lg border border-hairline-light dark:border-[#2E3039] bg-canvas-light dark:bg-canvas-dark outline-hidden focus:border-brand"
       ></textarea>
       <div class="flex items-center gap-3 mt-2">
         <button class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-brand text-white hover:bg-brand-hover" @click="runImport">{{ t('import') }}</button>
@@ -413,7 +413,7 @@ function onImportFile(e: Event) {
         :value="exportText"
         rows="6"
         readonly
-        class="w-full text-xs font-mono p-2.5 rounded-lg border border-hairline-light dark:border-[#2E3039] bg-canvas-light dark:bg-canvas-dark outline-none"
+        class="w-full text-xs font-mono p-2.5 rounded-lg border border-hairline-light dark:border-[#2E3039] bg-canvas-light dark:bg-canvas-dark outline-hidden"
       ></textarea>
       <div class="flex gap-3 mt-2">
         <button class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-brand text-white hover:bg-brand-hover" @click="downloadExport">{{ t('download') }}</button>
@@ -503,7 +503,7 @@ function onImportFile(e: Event) {
             <input
               v-model="selected.name"
               placeholder="Environment name (e.g. LIVE)"
-              class="flex-1 text-[22px] font-bold tracking-tight bg-transparent border-b border-transparent hover:border-hairline-light dark:hover:border-hairline-dark focus:border-brand outline-none py-0.5"
+              class="flex-1 text-[22px] font-bold tracking-tight bg-transparent border-b border-transparent hover:border-hairline-light dark:hover:border-hairline-dark focus:border-brand outline-hidden py-0.5"
             />
             <label class="inline-flex items-center gap-2 text-sm cursor-pointer">
               <input type="checkbox" class="accent-brand w-4 h-4" :checked="selected.enabled" @change="toggleGroup(selected.id, ($event.target as HTMLInputElement).checked)" />
@@ -519,7 +519,7 @@ function onImportFile(e: Event) {
             <input
               v-model="selected.exclusiveTag"
               placeholder="e.g. environment"
-              class="w-56 text-[13px] font-mono bg-surface-light dark:bg-surface-dark border border-hairline-light dark:border-[#2E3039] rounded-lg px-3 py-2 outline-none focus:border-brand"
+              class="w-56 text-[13px] font-mono bg-surface-light dark:bg-surface-dark border border-hairline-light dark:border-[#2E3039] rounded-lg px-3 py-2 outline-hidden focus:border-brand"
             />
             <span class="text-xs text-muted-light dark:text-muted-dark">{{ t('exclusiveHint') }}</span>
           </div>
@@ -547,7 +547,7 @@ function onImportFile(e: Event) {
                 v-if="selected.condition.matchType === 'urlFilter' || selected.condition.matchType === 'regexFilter'"
                 v-model="selected.condition.pattern"
                 :placeholder="selected.condition.matchType === 'regexFilter' ? '^https://api\\.example\\.com/.*' : 'https://api.myapp.com/*'"
-                class="flex-1 min-w-[220px] text-[13px] font-mono bg-canvas-light dark:bg-canvas-dark border rounded-lg px-3 py-2 outline-none focus:border-brand"
+                class="flex-1 min-w-[220px] text-[13px] font-mono bg-canvas-light dark:bg-canvas-dark border rounded-lg px-3 py-2 outline-hidden focus:border-brand"
                 :class="regexError && selected.condition.matchType === 'regexFilter' ? 'border-danger' : 'border-hairline-light dark:border-[#2E3039]'"
               />
             </div>
@@ -562,7 +562,7 @@ function onImportFile(e: Event) {
                 <input
                   v-model="selected.condition.patterns[i]"
                   placeholder="https://api.example.com/*"
-                  class="flex-1 min-w-0 text-[13px] font-mono bg-canvas-light dark:bg-canvas-dark border border-hairline-light dark:border-[#2E3039] rounded-lg px-3 py-2 outline-none focus:border-brand"
+                  class="flex-1 min-w-0 text-[13px] font-mono bg-canvas-light dark:bg-canvas-dark border border-hairline-light dark:border-[#2E3039] rounded-lg px-3 py-2 outline-hidden focus:border-brand"
                 />
                 <button
                   class="shrink-0 text-muted-light dark:text-muted-dark hover:text-danger px-1.5 text-sm"
@@ -640,7 +640,7 @@ function onImportFile(e: Event) {
                     <button
                       v-for="t in HEADER_TEMPLATES"
                       :key="t.label"
-                      class="flex items-baseline gap-2 w-full text-left text-xs px-2.5 py-2 rounded hover:bg-brand-tint dark:hover:bg-[#1C2140]"
+                      class="flex items-baseline gap-2 w-full text-left text-xs px-2.5 py-2 rounded-sm hover:bg-brand-tint dark:hover:bg-[#1C2140]"
                       @click="onTemplate(t)"
                     >
                       <span class="font-medium">{{ t.label }}</span>
@@ -670,13 +670,13 @@ function onImportFile(e: Event) {
                 v-model="h.label"
                 :placeholder="t('labelOptional')"
                 title="Display-only label — never sent"
-                class="w-36 shrink-0 text-[13px] bg-transparent border border-hairline-light dark:border-[#2E3039] rounded-lg px-2.5 py-2 outline-none focus:border-brand placeholder:text-muted-light/70 dark:placeholder:text-muted-dark/70"
+                class="w-36 shrink-0 text-[13px] bg-transparent border border-hairline-light dark:border-[#2E3039] rounded-lg px-2.5 py-2 outline-hidden focus:border-brand placeholder:text-muted-light/70 dark:placeholder:text-muted-dark/70"
               />
-              <select v-model="h.target" class="text-xs font-semibold bg-surface-light dark:bg-surface-dark border border-hairline-light dark:border-[#2E3039] rounded-lg px-2 py-2 outline-none">
+              <select v-model="h.target" class="text-xs font-semibold bg-surface-light dark:bg-surface-dark border border-hairline-light dark:border-[#2E3039] rounded-lg px-2 py-2 outline-hidden">
                 <option value="request">REQ</option>
                 <option value="response">RES</option>
               </select>
-              <select v-model="h.op" class="text-xs bg-surface-light dark:bg-surface-dark border border-hairline-light dark:border-[#2E3039] rounded-lg px-2 py-2 outline-none">
+              <select v-model="h.op" class="text-xs bg-surface-light dark:bg-surface-dark border border-hairline-light dark:border-[#2E3039] rounded-lg px-2 py-2 outline-hidden">
                 <option value="set">set</option>
                 <option value="append">append</option>
                 <option value="remove">remove</option>
@@ -685,14 +685,14 @@ function onImportFile(e: Event) {
                 v-model="h.name"
                 list="oh-header-names"
                 placeholder="Header-Name"
-                class="w-48 text-[13px] font-mono bg-canvas-light dark:bg-canvas-dark border rounded-lg px-3 py-2 outline-none focus:border-brand"
+                class="w-48 text-[13px] font-mono bg-canvas-light dark:bg-canvas-dark border rounded-lg px-3 py-2 outline-hidden focus:border-brand"
                 :class="isSensitiveHeader(h.name) ? 'border-warning/60' : 'border-hairline-light dark:border-[#2E3039]'"
               />
               <input
                 v-if="h.op !== 'remove'"
                 v-model="h.value"
                 placeholder="value"
-                class="flex-1 text-[13px] font-mono bg-canvas-light dark:bg-canvas-dark border border-hairline-light dark:border-[#2E3039] rounded-lg px-3 py-2 outline-none focus:border-brand"
+                class="flex-1 text-[13px] font-mono bg-canvas-light dark:bg-canvas-dark border border-hairline-light dark:border-[#2E3039] rounded-lg px-3 py-2 outline-hidden focus:border-brand"
               />
               <span v-else class="flex-1 text-xs text-muted-light dark:text-muted-dark italic px-2">{{ t('removesHeader') }}</span>
               <button class="text-muted-light dark:text-muted-dark hover:text-danger px-1.5 text-sm" @click="removeHeader(selected.id, h.id)" title="Remove">✕</button>
@@ -745,7 +745,7 @@ function onImportFile(e: Event) {
     <!-- Easter-egg game overlay -->
     <div
       v-if="gameOpen"
-      class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#06070B]/85 backdrop-blur-sm p-4"
+      class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#06070B]/85 backdrop-blur-xs p-4"
     >
       <div class="w-[420px] max-w-full mb-3 flex items-center justify-between text-white">
         <div>
@@ -762,10 +762,10 @@ function onImportFile(e: Event) {
       </div>
       <StackGame large />
       <div class="mt-3 flex items-center gap-2 font-mono text-[9px] font-semibold tracking-wider text-white/45">
-        <span class="rounded border border-white/15 bg-white/5 px-2 py-1 text-white/70">SPACE</span>
+        <span class="rounded-sm border border-white/15 bg-white/5 px-2 py-1 text-white/70">SPACE</span>
         <span>{{ t('arcadeDropHeader') }}</span>
         <span class="mx-1 text-white/20">//</span>
-        <span class="rounded border border-white/15 bg-white/5 px-2 py-1 text-white/70">ENTER</span>
+        <span class="rounded-sm border border-white/15 bg-white/5 px-2 py-1 text-white/70">ENTER</span>
         <span>{{ t('arcadeRetry') }}</span>
       </div>
     </div>
@@ -773,7 +773,7 @@ function onImportFile(e: Event) {
     <!-- Deep-cut easter egg: Headerfall (typed "tetris") -->
     <div
       v-if="headerfallOpen"
-      class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#06070B]/85 backdrop-blur-sm p-4 overflow-y-auto"
+      class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#06070B]/85 backdrop-blur-xs p-4 overflow-y-auto"
     >
       <div class="w-[330px] max-w-full mb-3 flex items-center justify-between text-white">
         <div>
@@ -790,16 +790,16 @@ function onImportFile(e: Event) {
       </div>
       <HeaderfallGame />
       <div class="mt-3 flex items-center gap-2 font-mono text-[9px] font-semibold tracking-wider text-white/45">
-        <span class="rounded border border-white/15 bg-white/5 px-2 py-1 text-white/70">← →</span>
+        <span class="rounded-sm border border-white/15 bg-white/5 px-2 py-1 text-white/70">← →</span>
         <span>{{ t('headerfallMove') }}</span>
         <span class="mx-1 text-white/20">//</span>
-        <span class="rounded border border-white/15 bg-white/5 px-2 py-1 text-white/70">↑</span>
+        <span class="rounded-sm border border-white/15 bg-white/5 px-2 py-1 text-white/70">↑</span>
         <span>{{ t('headerfallRotate') }}</span>
         <span class="mx-1 text-white/20">//</span>
-        <span class="rounded border border-white/15 bg-white/5 px-2 py-1 text-white/70">C</span>
+        <span class="rounded-sm border border-white/15 bg-white/5 px-2 py-1 text-white/70">C</span>
         <span>{{ t('headerfallHold') }}</span>
         <span class="mx-1 text-white/20">//</span>
-        <span class="rounded border border-white/15 bg-white/5 px-2 py-1 text-white/70">P</span>
+        <span class="rounded-sm border border-white/15 bg-white/5 px-2 py-1 text-white/70">P</span>
         <span>{{ t('headerfallPause') }}</span>
       </div>
     </div>
@@ -807,9 +807,9 @@ function onImportFile(e: Event) {
     <!-- 418 easter egg: the hidden arcade index (typed "teapot") -->
     <div
       v-if="teapotOpen"
-      class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#06070B]/85 backdrop-blur-sm p-4"
+      class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#06070B]/85 backdrop-blur-xs p-4"
     >
-      <div class="w-[340px] max-w-full rounded-2xl border border-white/10 bg-[#0C0D11] p-6 text-center shadow-2xl">
+      <div class="w-[340px] max-w-full rounded-2xl border border-white/10 bg-canvas-dark p-6 text-center shadow-2xl">
         <div class="font-mono text-[10px] font-bold tracking-[0.2em] text-[#8FB4FF]">{{ t('teapotProtocol') }}</div>
         <div class="mt-4 text-5xl leading-none">🫖</div>
         <div class="mt-3 font-mono text-2xl font-extrabold text-warning">418</div>

@@ -142,7 +142,7 @@ function chipText(hex: string): string {
       class="flex items-center justify-between px-4 py-3 border-b border-hairline-light dark:border-hairline-dark"
     >
       <div class="flex items-center gap-2.5">
-        <button class="flex items-center rounded-md focus:outline-none" title="Overhead" @click="onLogoClick">
+        <button class="flex items-center rounded-md focus:outline-hidden" title="Overhead" @click="onLogoClick">
           <MarkLogo :size="22" :dancing="dancing" />
         </button>
         <span class="font-bold tracking-tight">{{ APP.name }}</span>
@@ -161,7 +161,7 @@ function chipText(hex: string): string {
           @change="toggleMaster(($event.target as HTMLInputElement).checked)"
         />
         <span
-          class="w-9 h-5 rounded-full bg-hairline-light dark:bg-[#2E3039] peer-checked:bg-brand relative transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"
+          class="w-9 h-5 rounded-full bg-hairline-light dark:bg-[#2E3039] peer-checked:bg-brand dark:peer-checked:bg-brand relative transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"
         ></span>
       </label>
     </header>
@@ -178,7 +178,7 @@ function chipText(hex: string): string {
           class="oh-chip px-3 py-1.5 rounded-full text-xs font-semibold border"
           :class="[
             g.enabled
-              ? 'border-transparent shadow-sm'
+              ? 'border-transparent shadow-xs'
               : 'bg-surface-light dark:bg-[#1B1C23] text-muted-light dark:text-muted-dark border-hairline-light dark:border-[#2E3039]',
             g.enabled && state.enabled && pageState(g) === 'here' && 'ring-2 ring-offset-2 ring-offset-surface-light dark:ring-offset-surface-dark ring-brand',
             !state.enabled && 'opacity-50',
@@ -252,7 +252,7 @@ function chipText(hex: string): string {
           <button
             v-for="t in HEADER_TEMPLATES"
             :key="t.label"
-            class="flex items-baseline gap-2 w-full text-left text-[11px] px-2 py-1.5 rounded hover:bg-brand-tint dark:hover:bg-[#1C2140]"
+            class="flex items-baseline gap-2 w-full text-left text-[11px] px-2 py-1.5 rounded-sm hover:bg-brand-tint dark:hover:bg-[#1C2140]"
             @click="onTemplate(g.id, t)"
           >
             <span class="font-medium">{{ t.label }}</span>
@@ -266,7 +266,7 @@ function chipText(hex: string): string {
           <div class="flex items-center gap-1.5 py-0.5">
           <input type="checkbox" v-model="h.enabled" class="accent-brand w-3.5 h-3.5 shrink-0" title="Enable" />
           <button
-            class="shrink-0 uppercase text-[9.5px] font-bold tracking-wide px-1.5 py-1 rounded"
+            class="shrink-0 uppercase text-[9.5px] font-bold tracking-wide px-1.5 py-1 rounded-sm"
             :class="
               h.target === 'response'
                 ? 'bg-[#F1F2F4] text-muted-light dark:bg-[#24262E] dark:text-muted-dark'
@@ -276,7 +276,7 @@ function chipText(hex: string): string {
             @click="toggleTarget(h)"
           >{{ h.target === 'response' ? 'RES' : 'REQ' }}</button>
           <button
-            class="shrink-0 uppercase text-[9.5px] font-bold px-1.5 py-1 rounded bg-hairline-light dark:bg-[#24262E] text-muted-light dark:text-muted-dark"
+            class="shrink-0 uppercase text-[9.5px] font-bold px-1.5 py-1 rounded-sm bg-hairline-light dark:bg-[#24262E] text-muted-light dark:text-muted-dark"
             title="Cycle set / append / remove"
             @click="cycleOp(h)"
           >{{ opLabel(h.op) }}</button>
@@ -284,14 +284,14 @@ function chipText(hex: string): string {
             v-model="h.name"
             list="oh-header-names"
             placeholder="Header"
-            class="flex-1 min-w-0 font-mono text-xs bg-transparent border rounded px-1.5 py-1 outline-none focus:border-brand"
+            class="flex-1 min-w-0 font-mono text-xs bg-transparent border rounded-sm px-1.5 py-1 outline-hidden focus:border-brand"
             :class="isSensitiveHeader(h.name) ? 'border-warning/60' : 'border-hairline-light dark:border-[#2E3039]'"
           />
           <input
             v-if="h.op !== 'remove'"
             v-model="h.value"
             placeholder="value"
-            class="flex-1 min-w-0 font-mono text-xs bg-transparent border border-hairline-light dark:border-[#2E3039] rounded px-1.5 py-1 outline-none focus:border-brand"
+            class="flex-1 min-w-0 font-mono text-xs bg-transparent border border-hairline-light dark:border-[#2E3039] rounded-sm px-1.5 py-1 outline-hidden focus:border-brand"
           />
           <span v-else class="flex-1 text-[10px] text-muted-light dark:text-muted-dark italic">{{ t('removed') }}</span>
           <button class="shrink-0 text-muted-light dark:text-muted-dark hover:text-danger px-0.5" title="Remove" @click="removeHeader(g.id, h.id)">✕</button>

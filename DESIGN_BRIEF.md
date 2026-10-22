@@ -80,7 +80,7 @@ Referenz + Marketing.
 ## 4) PROMPT B — Farb- & Token-System
 
 Der Code erwartet ein paar konkrete Tokens. Bitte lass Claude Design **genau diese** Werte
-liefern (Hex), dann verdrahte ich sie in `tailwind.config.cjs` und `src/types.ts`.
+liefern (Hex), dann verdrahte ich sie im `@theme`-Block von `src/style.css` und in `src/types.ts`.
 
 Benötigte Tokens:
 - **Primary accent** (`brand.DEFAULT`), **accent hover** (`brand.hover`), **accent tint** (heller
@@ -104,7 +104,7 @@ Benötigte Tokens:
 > 4. **Semantic status colors:** success, warning, danger.
 >
 > The overall feel: restrained, professional, trustworthy — not neon, not pastel. Then output the
-> palette as (a) a hex table and (b) a Tailwind `theme.extend.colors` snippet.
+> palette as (a) a hex table and (b) a Tailwind v4 `@theme` CSS snippet.
 
 ---
 
@@ -180,8 +180,8 @@ Damit ich es direkt einbaue, brauche ich:
 
 1. **Icons:** die 4 PNGs `icon-16.png`, `icon-32.png`, `icon-48.png`, `icon-128.png` (transparent)
    → kommen nach `src/icons/` (ersetzen die Platzhalter). Plus das Master-SVG nach `src/icons/`.
-2. **Farb-Tokens:** die Hex-Tabelle **oder** direkt das Tailwind-`colors`-Snippet. Ich trage ein:
-   - `brand.DEFAULT / brand.hover / brand.tint` → `tailwind.config.cjs`
+2. **Farb-Tokens:** die Hex-Tabelle **oder** direkt das Tailwind-`@theme`-Snippet. Ich trage ein:
+   - `--color-brand / --color-brand-hover / --color-brand-tint` → `@theme` in `src/style.css`
    - die 6 Environment-Farben → `GROUP_COLORS` in `src/types.ts`
    - success/warning/danger → wo im UI genutzt.
 3. **Optional:** Logo-Lockup (SVG/PNG) für README/Landingpage und die Store-Assets als PNG.
@@ -193,7 +193,7 @@ haben das fertige Branding live. Bis dahin läuft alles mit neutralen Platzhalte
 
 ### Schnell-Referenz: aktuelle Platzhalter-Werte (die du ersetzt)
 
-- Primary accent: `#4f46e5` (Indigo) — `tailwind.config.cjs` → `brand`
+- Primary accent: `#4f46e5` (Indigo) — `src/style.css` (`@theme`) → `--color-brand`
 - Environment-Palette (`src/types.ts` → `GROUP_COLORS`):
   `#ef4444` (LIVE) · `#22c55e` (DEV) · `#f59e0b` (Staging) · `#3b82f6` · `#a855f7` · `#14b8a6`
 - Badge „aktiv": `#22c55e` (`src/background.ts`)
